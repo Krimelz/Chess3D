@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TestController : MonoBehaviour
+public class BoardController : MonoBehaviour
 {
     public GameObject highlihgt;
     private Camera _camera;
     private Ray _ray;
     private RaycastHit _hit;
+    private Piece[,] chessboard = new Piece[8, 8];
 
     void Start()
     {
@@ -15,7 +16,7 @@ public class TestController : MonoBehaviour
         _hit = new RaycastHit();
     }
 
-    void FixedUpdate()
+    void Update()
     {
         _ray = _camera.ScreenPointToRay(Input.mousePosition);
 
@@ -28,5 +29,10 @@ public class TestController : MonoBehaviour
         {
             highlihgt.SetActive(false);
         }
+    }
+
+    Piece GetSpace(int xCoord, int yCoord)
+    {
+        return chessboard[xCoord, yCoord];
     }
 }
