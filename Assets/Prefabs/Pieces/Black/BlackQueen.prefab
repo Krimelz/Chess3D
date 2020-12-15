@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 3200426594865920874}
   - component: {fileID: 2001261371697476815}
   - component: {fileID: 4332779314596397061}
+  - component: {fileID: 9009761000619709422}
   m_Layer: 0
   m_Name: BlackQueen
   m_TagString: Untagged
@@ -81,3 +82,16 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &9009761000619709422
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2819785137741521360}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a7777abfe446c8447991d8617a78c48a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isWhite: 0
