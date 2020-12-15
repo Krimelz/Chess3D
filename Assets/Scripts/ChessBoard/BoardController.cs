@@ -4,17 +4,18 @@ using UnityEngine;
 
 public class BoardController : MonoBehaviour
 {
-    public GameObject highlihgt;
-    private Camera _camera;
-    private Ray _ray;
-    private RaycastHit _hit = new RaycastHit();
+    public GameObject           highlihgt;
+    public List<GameObject>     piecesPrefabs;
+
+    private Camera              _camera;
+    private Ray                 _ray;
+    private RaycastHit          _hit = new RaycastHit();
     [SerializeField]
-    private Vector2Int _selection;
-    public List<GameObject> piecesPrefabs;
-    private List<GameObject> _pieces = new List<GameObject>();
-    private Piece[,] _chessboard = new Piece[8, 8];
-    private Piece _selectedPiece;
-    private bool isWhiteTurn = true;
+    private Vector2Int          _selection;
+    private List<GameObject>    _pieces = new List<GameObject>();
+    private Piece[,]            _chessboard = new Piece[8, 8];
+    private Piece               _selectedPiece;
+    private bool                _isWhiteTurn = true;
 
     void Start()
     {
@@ -64,7 +65,7 @@ public class BoardController : MonoBehaviour
         if (_chessboard[x, y] == null)
             return;
 
-        if (_chessboard[x, y].isWhite != isWhiteTurn)
+        if (_chessboard[x, y].isWhite != _isWhiteTurn)
             return;
 
         _selectedPiece = _chessboard[x, y];
@@ -77,6 +78,7 @@ public class BoardController : MonoBehaviour
             _chessboard[_selectedPiece.Position.x, _selectedPiece.Position.y] = null;
             _selectedPiece.transform.position = CalcSpaceCoords(x, y);
             _chessboard[x, y] = _selectedPiece;
+            _isWhiteTurn = !_isWhiteTurn;
         }
 
         _selectedPiece = null;
