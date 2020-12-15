@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &5216548723526317030
+--- !u!1 &6191968876269433650
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,45 +8,46 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 4841149423998069084}
-  - component: {fileID: 8394969556039427833}
-  - component: {fileID: 6008957613212045875}
+  - component: {fileID: 6820026872280131976}
+  - component: {fileID: 7568934533390607917}
+  - component: {fileID: 5687684120902095591}
+  - component: {fileID: -599819278796843406}
   m_Layer: 0
-  m_Name: Pawn
+  m_Name: WhiteBishop
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &4841149423998069084
+--- !u!4 &6820026872280131976
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5216548723526317030}
+  m_GameObject: {fileID: 6191968876269433650}
   m_LocalRotation: {x: -6.1232336e-17, y: 1, z: 6.1232336e-17, w: -0.00000004371139}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: -2.1479025, y: 0.24882203, z: -0.53536224}
   m_LocalScale: {x: 0.415625, y: 0.65625, z: 0.415625}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!33 &8394969556039427833
+--- !u!33 &7568934533390607917
 MeshFilter:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5216548723526317030}
-  m_Mesh: {fileID: 1705324974331375986, guid: 2ba80caf47edfa9468b1bc4252980995, type: 3}
---- !u!23 &6008957613212045875
+  m_GameObject: {fileID: 6191968876269433650}
+  m_Mesh: {fileID: -7929665542823436400, guid: b147162366c549740bd992b2f88c719f, type: 3}
+--- !u!23 &5687684120902095591
 MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5216548723526317030}
+  m_GameObject: {fileID: 6191968876269433650}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -81,3 +82,16 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &-599819278796843406
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6191968876269433650}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6d5003f86dc250c42a63ee501ec4d58b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isWhite: 1

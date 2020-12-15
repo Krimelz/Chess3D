@@ -1,9 +1,12 @@
-﻿abstract class Piece
+﻿using UnityEngine;
+
+public abstract class Piece : MonoBehaviour
 {
-    public abstract void GetPath();
+    public Vector2Int Position { get; set; }
+    public bool isWhite;
 
-    public void Move(int xSpace, int ySpace)
+    public virtual bool PossibleMove(int x, int y)
     {
-
+        return true;
     }
 }

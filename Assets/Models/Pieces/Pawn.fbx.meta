@@ -7,11 +7,6 @@ ModelImporter:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: No Name
-    second: {fileID: 2100000, guid: 8e7bcc04facdda2469dc4250d9a4c67f, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
       name: WhitePiece
     second: {fileID: 2100000, guid: 21a9870cc6af8614d953cca2201db41d, type: 2}
   materials:
