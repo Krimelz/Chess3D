@@ -7,14 +7,18 @@ public class BoardController : MonoBehaviour
     public GameObject           highlihgt;
     public List<GameObject>     piecesPrefabs;
 
+    public GameObject moveHighlightPrefab;
+    private GameObject[,] _moveHighlights = new GameObject[8, 8];
+
     private Camera              _camera;
     private Ray                 _ray;
     private RaycastHit          _hit = new RaycastHit();
+
     [SerializeField]
     private Vector2Int          _selection;
+    private Piece               _selectedPiece;
     private List<GameObject>    _pieces = new List<GameObject>();
     private Piece[,]            _chessboard = new Piece[8, 8];
-    private Piece               _selectedPiece;
     private bool                _isWhiteTurn = true;
 
     void Start()
@@ -22,6 +26,15 @@ public class BoardController : MonoBehaviour
         _camera = Camera.main;
 
         SpawnAllPieces();
+
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                _moveHighlights[i, j] = Instantiate(moveHighlightPrefab, new Vector3(i, 0.05f, j), Quaternion.identity);
+                _moveHighlights[i, j].SetActive(false);
+            }
+        }
     }
 
     void Update()
@@ -69,16 +82,37 @@ public class BoardController : MonoBehaviour
             return;
 
         _selectedPiece = _chessboard[x, y];
+
+        var moves = _selectedPiece.PossibleMove();
+
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                _moveHighlights[i, j].SetActive(moves[i, j]);
+            }
+        }
     }
 
     void MovePiece(int x, int y)
     {
-        if (_selectedPiece.PossibleMove(x, y))
+        var moves = _selectedPiece.PossibleMove();
+
+        if (moves[x, y])
         {
             _chessboard[_selectedPiece.Position.x, _selectedPiece.Position.y] = null;
             _selectedPiece.transform.position = CalcSpaceCoords(x, y);
+            _selectedPiece.Position = new Vector2Int(x, y);
             _chessboard[x, y] = _selectedPiece;
             _isWhiteTurn = !_isWhiteTurn;
+        }
+
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                _moveHighlights[i, j].SetActive(false);
+            }
         }
 
         _selectedPiece = null;
@@ -151,10 +185,5 @@ public class BoardController : MonoBehaviour
     Vector3 CalcSpaceCoords(int x, int y)
     {
         return new Vector3(x, 0f, y);
-    }
-
-    Piece GetSpace(Vector2Int coords)
-    {
-        return _chessboard[coords.x, coords.y];
     }
 }

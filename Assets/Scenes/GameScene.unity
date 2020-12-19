@@ -319,6 +319,7 @@ MonoBehaviour:
   - {fileID: 7541834497177910232, guid: 475b84d2bb14bcd44bc73533107cac77, type: 3}
   - {fileID: 2819785137741521360, guid: 1dbbbeddd36e620459ce39a8ceccb5ca, type: 3}
   - {fileID: 7043365071066418629, guid: 2059c08d07740144d92aa7dc13adf43b, type: 3}
+  moveHighlightPrefab: {fileID: 1286990052966202235, guid: 10f6386b3a6a4a646b270d205ed049c9, type: 3}
   _selection: {x: 0, y: 0}
 --- !u!65 &478620445
 BoxCollider:
@@ -423,7 +424,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1761793273}
   m_LocalRotation: {x: 0.7071068, y: 0, z: 0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0.11, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}

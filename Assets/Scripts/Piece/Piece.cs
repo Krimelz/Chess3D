@@ -5,8 +5,8 @@ public abstract class Piece : MonoBehaviour
     public Vector2Int Position { get; set; }
     public bool isWhite;
 
-    public virtual bool PossibleMove(int x, int y)
+    public virtual bool[,] PossibleMove()
     {
-        return true;
+        return new bool[8, 8];
     }
 }
