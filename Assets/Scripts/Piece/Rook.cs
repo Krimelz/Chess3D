@@ -7,18 +7,87 @@ public class Rook : Piece
     public override bool[,] PossibleMove()
     {
         bool[,] moves = new bool[8, 8];
+        Piece p;
 
-        for (int i = 0; i < 8; i++)
+        // right
+        for (int i = Position.y + 1; i < 8; i++)
         {
-            moves[i, Position.y] = true;
+            p = BoardController.Instance.chessboard[Position.x, i];
+
+            if (p == null)
+            {
+                moves[Position.x, i] = true;
+            }
+            else
+            {
+                if (isWhite != p.isWhite)
+                {
+                    moves[Position.x, i] = true;
+                }
+
+                break;
+            }
         }
 
-        for (int i = 0; i < 8; i++)
+        // left
+        for (int i = Position.y - 1; i >= 0; i--)
         {
-            moves[Position.x, i] = true;
+            p = BoardController.Instance.chessboard[Position.x, i];
+
+            if (p == null)
+            {
+                moves[Position.x, i] = true;
+            }
+            else
+            {
+                if (isWhite != p.isWhite)
+                {
+                    moves[Position.x, i] = true;
+                }
+
+                break;
+            }
         }
 
-        moves[Position.x, Position.y] = false;
+        // up
+        for (int i = Position.x - 1; i >= 0; i--)
+        {
+            p = BoardController.Instance.chessboard[i, Position.y];
+
+            if (p == null)
+            {
+                moves[i, Position.y] = true;
+            }
+            else
+            {
+                if (isWhite != p.isWhite)
+                {
+                    moves[i, Position.y] = true;
+                }
+
+                break;
+            }
+        }
+
+        // down
+        for (int i = Position.x + 1; i < 8; i++)
+        {
+            p = BoardController.Instance.chessboard[i, Position.y];
+
+            if (p == null)
+            {
+                moves[i, Position.y] = true;
+            }
+            else
+            {
+                if (isWhite != p.isWhite)
+                {
+                    moves[i, Position.y] = true;
+                }
+
+                break;
+            }
+        }
 
         return moves;
     }

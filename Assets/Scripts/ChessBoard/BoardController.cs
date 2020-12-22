@@ -4,37 +4,36 @@ using UnityEngine;
 
 public class BoardController : MonoBehaviour
 {
-    public GameObject           highlihgt;
-    public List<GameObject>     piecesPrefabs;
+    public static BoardController Instance { get; set; }
+    private bool[,]             _allowedMoves { get; set; }
 
-    public GameObject moveHighlightPrefab;
-    private GameObject[,] _moveHighlights = new GameObject[8, 8];
+    [SerializeField]
+    private GameObject           _highlihgt;
+    [SerializeField]
+    private List<GameObject>     _piecesPrefabs;
+
+    [SerializeField]
+    public GameObject           _moveHighlightPrefab;
+    private GameObject[,]       _moveHighlights = new GameObject[8, 8];
 
     private Camera              _camera;
     private Ray                 _ray;
     private RaycastHit          _hit = new RaycastHit();
 
+    public Piece[,]             chessboard = new Piece[8, 8];
     [SerializeField]
     private Vector2Int          _selection;
     private Piece               _selectedPiece;
     private List<GameObject>    _pieces = new List<GameObject>();
-    private Piece[,]            _chessboard = new Piece[8, 8];
     private bool                _isWhiteTurn = true;
 
     void Start()
     {
+        Instance = this;
         _camera = Camera.main;
 
         SpawnAllPieces();
-
-        for (int i = 0; i < 8; i++)
-        {
-            for (int j = 0; j < 8; j++)
-            {
-                _moveHighlights[i, j] = Instantiate(moveHighlightPrefab, new Vector3(i, 0.05f, j), Quaternion.identity);
-                _moveHighlights[i, j].SetActive(false);
-            }
-        }
+        CreateMoveHighligts();
     }
 
     void Update()
@@ -43,7 +42,7 @@ public class BoardController : MonoBehaviour
 
         if (Input.GetMouseButtonDown(0))
         {
-            if (highlihgt.activeSelf)
+            if (_highlihgt.activeSelf)
             {
                 if (_selectedPiece == null)
                 {
@@ -63,67 +62,66 @@ public class BoardController : MonoBehaviour
 
         if (Physics.Raycast(_ray, out _hit))
         {
-            highlihgt.SetActive(true);
+            _highlihgt.SetActive(true);
             _selection = new Vector2Int(Mathf.RoundToInt(_hit.point.x), Mathf.RoundToInt(_hit.point.z));
-            highlihgt.transform.position = new Vector3(_selection.x, 0.025f, _selection.y);
+            _highlihgt.transform.position = new Vector3(_selection.x, 0.015f, _selection.y);
         }
         else
         {
-            highlihgt.SetActive(false);
+            _highlihgt.SetActive(false);
         }
     }
 
     void SelectPiece(int x, int y)
     {
-        if (_chessboard[x, y] == null)
+        if (chessboard[x, y] == null)
             return;
 
-        if (_chessboard[x, y].isWhite != _isWhiteTurn)
+        if (chessboard[x, y].isWhite != _isWhiteTurn)
             return;
 
-        _selectedPiece = _chessboard[x, y];
+        _allowedMoves = chessboard[x, y].PossibleMove();
+        _selectedPiece = chessboard[x, y];
 
-        var moves = _selectedPiece.PossibleMove();
-
-        for (int i = 0; i < 8; i++)
-        {
-            for (int j = 0; j < 8; j++)
-            {
-                _moveHighlights[i, j].SetActive(moves[i, j]);
-            }
-        }
+        EnableMoveHighligts();
     }
 
     void MovePiece(int x, int y)
     {
-        var moves = _selectedPiece.PossibleMove();
-
-        if (moves[x, y])
+        if (_allowedMoves[x, y])
         {
-            _chessboard[_selectedPiece.Position.x, _selectedPiece.Position.y] = null;
+            Piece p = chessboard[x, y];
+
+            if (p != null && p.isWhite != _isWhiteTurn)
+            {
+                if (p.GetType() == typeof(King))
+                {
+                    EndGame();
+                    return;
+                }
+
+                _pieces.Remove(p.gameObject);
+                Destroy(p.gameObject);
+            }
+
+            chessboard[_selectedPiece.Position.x, _selectedPiece.Position.y] = null;
             _selectedPiece.transform.position = CalcSpaceCoords(x, y);
             _selectedPiece.Position = new Vector2Int(x, y);
-            _chessboard[x, y] = _selectedPiece;
+            chessboard[x, y] = _selectedPiece;
             _isWhiteTurn = !_isWhiteTurn;
         }
 
-        for (int i = 0; i < 8; i++)
-        {
-            for (int j = 0; j < 8; j++)
-            {
-                _moveHighlights[i, j].SetActive(false);
-            }
-        }
+        DisableMoveHighligts();
 
         _selectedPiece = null;
     }
 
     void SpawnPiece(int index, int x, int y)
     {
-        GameObject piece = Instantiate(piecesPrefabs[index], CalcSpaceCoords(x, y), Quaternion.identity);
+        GameObject piece = Instantiate(_piecesPrefabs[index], CalcSpaceCoords(x, y), Quaternion.identity);
         piece.transform.SetParent(transform);
-        _chessboard[x, y] = piece.GetComponent<Piece>();
-        _chessboard[x, y].Position = new Vector2Int(x, y);
+        chessboard[x, y] = piece.GetComponent<Piece>();
+        chessboard[x, y].Position = new Vector2Int(x, y);
         _pieces.Add(piece);
     }
 
@@ -182,8 +180,58 @@ public class BoardController : MonoBehaviour
         SpawnPiece(11, 4, 7);
     }
 
+    private void DestroyAllPieces()
+    {
+        foreach (GameObject p in _pieces)
+        {
+            Destroy(p.gameObject);
+        }
+    }
+
+    private void CreateMoveHighligts()
+    {
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                _moveHighlights[i, j] = Instantiate(_moveHighlightPrefab, new Vector3(i, 0.025f, j), Quaternion.identity);
+                _moveHighlights[i, j].SetActive(false);
+            }
+        }
+    }
+
+    private void EnableMoveHighligts()
+    {
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                _moveHighlights[i, j].SetActive(_allowedMoves[i, j]);
+            }
+        }
+    }
+
+    private void DisableMoveHighligts()
+    {
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                _moveHighlights[i, j].SetActive(false);
+            }
+        }
+    }
+
     Vector3 CalcSpaceCoords(int x, int y)
     {
         return new Vector3(x, 0f, y);
+    }
+
+    private void EndGame()
+    {
+        DestroyAllPieces();
+        _isWhiteTurn = true;
+        SpawnAllPieces();
+        DisableMoveHighligts();
     }
 }

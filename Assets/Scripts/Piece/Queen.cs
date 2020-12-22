@@ -7,25 +7,202 @@ public class Queen : Piece
     public override bool[,] PossibleMove()
     {
         bool[,] moves = new bool[8, 8];
+        Piece p;
+        int i, j;
 
-        for (int i = 0; i < 8; i++)
+        // right
+        for (i = Position.y + 1; i < 8; i++)
         {
-            moves[i, Position.y] = true;
-        }
+            p = BoardController.Instance.chessboard[Position.x, i];
 
-        for (int i = 0; i < 8; i++)
-        {
-            moves[Position.x, i] = true;
-        }
-
-        for (int i = 0; i < 8; i++)
-        {
-            for (int j = 0; j < 8; j++)
+            if (p == null)
             {
-                if (Mathf.Abs(i - Position.x) == Mathf.Abs(j - Position.y))
+                moves[Position.x, i] = true;
+            }
+            else
+            {
+                if (isWhite != p.isWhite)
+                {
+                    moves[Position.x, i] = true;
+                }
+
+                break;
+            }
+        }
+
+        // left
+        for (i = Position.y - 1; i >= 0; i--)
+        {
+            p = BoardController.Instance.chessboard[Position.x, i];
+
+            if (p == null)
+            {
+                moves[Position.x, i] = true;
+            }
+            else
+            {
+                if (isWhite != p.isWhite)
+                {
+                    moves[Position.x, i] = true;
+                }
+
+                break;
+            }
+        }
+
+        // up
+        for (i = Position.x - 1; i >= 0; i--)
+        {
+            p = BoardController.Instance.chessboard[i, Position.y];
+
+            if (p == null)
+            {
+                moves[i, Position.y] = true;
+            }
+            else
+            {
+                if (isWhite != p.isWhite)
+                {
+                    moves[i, Position.y] = true;
+                }
+
+                break;
+            }
+        }
+
+        // down
+        for (i = Position.x + 1; i < 8; i++)
+        {
+            p = BoardController.Instance.chessboard[i, Position.y];
+
+            if (p == null)
+            {
+                moves[i, Position.y] = true;
+            }
+            else
+            {
+                if (isWhite != p.isWhite)
+                {
+                    moves[i, Position.y] = true;
+                }
+
+                break;
+            }
+        }
+
+        i = Position.x;
+        j = Position.y;
+
+        // left top
+        while (true)
+        {
+            i--;
+            j--;
+
+            if (i < 0 || j < 0)
+                break;
+
+            p = BoardController.Instance.chessboard[i, j];
+
+            if (p == null)
+            {
+                moves[i, j] = true;
+            }
+            else
+            {
+                if (isWhite != p.isWhite)
                 {
                     moves[i, j] = true;
                 }
+
+                break;
+            }
+        }
+
+        i = Position.x;
+        j = Position.y;
+
+        // right down
+        while (true)
+        {
+            i++;
+            j++;
+
+            if (i > 7 || j > 7)
+                break;
+
+            p = BoardController.Instance.chessboard[i, j];
+
+            if (p == null)
+            {
+                moves[i, j] = true;
+            }
+            else
+            {
+                if (isWhite != p.isWhite)
+                {
+                    moves[i, j] = true;
+                }
+
+                break;
+            }
+        }
+
+        i = Position.x;
+        j = Position.y;
+
+        // left down
+        while (true)
+        {
+            i++;
+            j--;
+
+            if (i > 7 || j < 0)
+                break;
+
+            p = BoardController.Instance.chessboard[i, j];
+
+            if (p == null)
+            {
+                moves[i, j] = true;
+            }
+            else
+            {
+                if (isWhite != p.isWhite)
+                {
+                    moves[i, j] = true;
+                }
+
+                break;
+            }
+        }
+
+        i = Position.x;
+        j = Position.y;
+
+        // right top
+        while (true)
+        {
+            i--;
+            j++;
+
+            if (i < 0 || j > 7)
+                break;
+
+            p = BoardController.Instance.chessboard[i, j];
+
+            if (p == null)
+            {
+                moves[i, j] = true;
+            }
+            else
+            {
+                if (isWhite != p.isWhite)
+                {
+                    moves[i, j] = true;
+                }
+
+                break;
             }
         }
 

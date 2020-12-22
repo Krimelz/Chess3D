@@ -24,7 +24,16 @@ public class Knight : Piece
     {
         if (x >= 0 && x <= 7 && y >= 0 && y <= 7)
         {
-            moves[x, y] = true;
+            Piece p = BoardController.Instance.chessboard[x, y];
+
+            if (p == null)
+            {
+                moves[x, y] = true;
+            }
+            else if (isWhite != p.isWhite)
+            {
+                moves[x, y] = true;
+            }
         }
     }
 }

@@ -305,8 +305,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b2687f95991e47c42baa8cfac23311cc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  highlihgt: {fileID: 1761793273}
-  piecesPrefabs:
+  _highlihgt: {fileID: 1761793273}
+  _piecesPrefabs:
   - {fileID: 6701472886605000626, guid: e5d9db2dc8146dd4db2d2ad28dc5b8d4, type: 3}
   - {fileID: 4591324205691979801, guid: 214bfd04e40166f47bcd2c9e324699b2, type: 3}
   - {fileID: 5879038939800926844, guid: dac7192953d8fa44fb2eda02fec7535d, type: 3}
@@ -319,7 +319,7 @@ MonoBehaviour:
   - {fileID: 7541834497177910232, guid: 475b84d2bb14bcd44bc73533107cac77, type: 3}
   - {fileID: 2819785137741521360, guid: 1dbbbeddd36e620459ce39a8ceccb5ca, type: 3}
   - {fileID: 7043365071066418629, guid: 2059c08d07740144d92aa7dc13adf43b, type: 3}
-  moveHighlightPrefab: {fileID: 1286990052966202235, guid: 10f6386b3a6a4a646b270d205ed049c9, type: 3}
+  _moveHighlightPrefab: {fileID: 1286990052966202235, guid: 10f6386b3a6a4a646b270d205ed049c9, type: 3}
   _selection: {x: 0, y: 0}
 --- !u!65 &478620445
 BoxCollider:

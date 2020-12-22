@@ -7,15 +7,117 @@ public class Bishop : Piece
     public override bool[,] PossibleMove()
     {
         bool[,] moves = new bool[8, 8];
+        Piece p;
 
-        for (int i = 0; i < 8; i++)
+        int i = Position.x;
+        int j = Position.y;
+
+        while (true)
         {
-            for (int j = 0; j < 8; j++)
+            i--;
+            j--;
+
+            if (i < 0 || j < 0)
+                break;
+
+            p = BoardController.Instance.chessboard[i, j];
+
+            if (p == null)
             {
-                if (Mathf.Abs(i - Position.x) == Mathf.Abs(j - Position.y))
+                moves[i, j] = true;
+            }
+            else
+            {
+                if (isWhite != p.isWhite)
                 {
                     moves[i, j] = true;
                 }
+
+                break;
+            }
+        }
+
+        i = Position.x;
+        j = Position.y;
+
+        while (true)
+        {
+            i++;
+            j++;
+
+            if (i > 7 || j > 7)
+                break;
+
+            p = BoardController.Instance.chessboard[i, j];
+
+            if (p == null)
+            {
+                moves[i, j] = true;
+            }
+            else
+            {
+                if (isWhite != p.isWhite)
+                {
+                    moves[i, j] = true;
+                }
+
+                break;
+            }
+        }
+
+        i = Position.x;
+        j = Position.y;
+
+        while (true)
+        {
+            i++;
+            j--;
+
+            if (i > 7 || j < 0)
+                break;
+
+            p = BoardController.Instance.chessboard[i, j];
+
+            if (p == null)
+            {
+                moves[i, j] = true;
+            }
+            else
+            {
+                if (isWhite != p.isWhite)
+                {
+                    moves[i, j] = true;
+                }
+
+                break;
+            }
+        }
+
+        i = Position.x;
+        j = Position.y;
+
+        while (true)
+        {
+            i--;
+            j++;
+
+            if (i < 0 || j > 7)
+                break;
+
+            p = BoardController.Instance.chessboard[i, j];
+
+            if (p == null)
+            {
+                moves[i, j] = true;
+            }
+            else
+            {
+                if (isWhite != p.isWhite)
+                {
+                    moves[i, j] = true;
+                }
+
+                break;
             }
         }
 
