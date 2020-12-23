@@ -7,6 +7,7 @@ public class Pawn : Piece
     public override bool[,] PossibleMove()
     {
         bool[,] moves = new bool[8, 8];
+        int[] passant = BoardController.Instance.Passant;
         Piece p1, p2;
 
         if (isWhite)
@@ -14,6 +15,11 @@ public class Pawn : Piece
             // left
             if (Position.x != 0 && Position.y != 7)
             {
+                if (passant[0] == Position.x - 1 && passant[1] == Position.y + 1)
+                {
+                    moves[Position.x - 1, Position.y + 1] = true;
+                }
+
                 p1 = BoardController.Instance.chessboard[Position.x - 1, Position.y + 1];
 
                 if (p1 != null && !p1.isWhite)
@@ -25,6 +31,11 @@ public class Pawn : Piece
             // right
             if (Position.x != 7 && Position.y != 7)
             {
+                if (passant[0] == Position.x + 1 && passant[1] == Position.y + 1)
+                {
+                    moves[Position.x + 1, Position.y + 1] = true;
+                }
+
                 p1 = BoardController.Instance.chessboard[Position.x + 1, Position.y + 1];
 
                 if (p1 != null && !p1.isWhite)
@@ -59,6 +70,11 @@ public class Pawn : Piece
             // right
             if (Position.x != 0 && Position.y != 0)
             {
+                if (passant[0] == Position.x + 1 && passant[1] == Position.y - 1)
+                {
+                    moves[Position.x + 1, Position.y + 1] = true;
+                }
+
                 p1 = BoardController.Instance.chessboard[Position.x - 1, Position.y - 1];
 
                 if (p1 != null && p1.isWhite)
@@ -70,6 +86,11 @@ public class Pawn : Piece
             // left
             if (Position.x != 7 && Position.y != 0)
             {
+                if (passant[0] == Position.x - 1 && passant[1] == Position.y - 1)
+                {
+                    moves[Position.x - 1, Position.y - 1] = true;
+                }
+
                 p1 = BoardController.Instance.chessboard[Position.x + 1, Position.y - 1];
 
                 if (p1 != null && p1.isWhite)

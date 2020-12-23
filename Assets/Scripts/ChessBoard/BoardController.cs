@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-// TODO: взятие на проходе
-
 public class BoardController : MonoBehaviour
 {
     public static BoardController Instance { get; set; }
@@ -19,20 +17,21 @@ public class BoardController : MonoBehaviour
     [SerializeField]
     private List<GameObject>    _piecesPrefabs;
 
+    public int[]                Passant { get; set; }
     [SerializeField]
     private GameObject          _moveHighlightPrefab;
-    private GameObject[,]       _moveHighlights = new GameObject[8, 8];
+    private GameObject[,]       _moveHighlights;
     private bool[,]             _allowedMoves { get; set; }
 
     private Camera              _camera;
     private Ray                 _ray;
     private RaycastHit          _hit = new RaycastHit();
 
-    public Piece[,]             chessboard = new Piece[8, 8];
+    public Piece[,]             chessboard;
     [SerializeField]
     private Vector2Int          _selection;
     private Piece               _selectedPiece;
-    private List<GameObject>    _pieces = new List<GameObject>();
+    private List<GameObject>    _pieces;
     private bool                _isWhiteTurn = true;
     private bool                _GameIsPaused = false;
 
@@ -123,11 +122,42 @@ public class BoardController : MonoBehaviour
                 Destroy(p.gameObject);
             }
 
-            if (_selectedPiece.GetType() == typeof(Pawn) && p == null && y == 7 || y == 0)
+            if (_selectedPiece.GetType() == typeof(Pawn))
             {
-                changePawn?.Invoke();
-                _GameIsPaused = true;
-                return;
+                if (p == null && y == 7 || y == 0)
+                {
+                    changePawn?.Invoke();
+                    _GameIsPaused = true;
+                    return;
+                }
+
+                if (x == Passant[0] && y == Passant[1])
+                {
+                    if (_isWhiteTurn)
+                    {
+                        p = chessboard[x, y - 1];
+                    }
+                    else
+                    {
+                        p = chessboard[x, y + 1];
+                    }
+
+                    _pieces.Remove(p.gameObject);
+                    Destroy(p.gameObject);
+                }
+
+                Passant[0] = -1;
+                Passant[1] = -1;
+                if (_selectedPiece.Position.y == 1 && y == 3)
+                {
+                    Passant[0] = x;
+                    Passant[1] = y - 1;
+                }
+                else if (_selectedPiece.Position.y == 6 && y == 4)
+                {
+                    Passant[0] = x;
+                    Passant[1] = y + 1;
+                }
             }
 
             chessboard[_selectedPiece.Position.x, _selectedPiece.Position.y] = null;
@@ -186,6 +216,9 @@ public class BoardController : MonoBehaviour
 
     void SpawnAllPieces()
     {
+        _pieces = new List<GameObject>();
+        chessboard = new Piece[8, 8];
+        Passant = new int[] { -1, -1 };
         // --- White --- //
 
         // Pawns
@@ -249,6 +282,8 @@ public class BoardController : MonoBehaviour
 
     private void CreateMoveHighligts()
     {
+        _moveHighlights = new GameObject[8, 8];
+
         for (int i = 0; i < 8; i++)
         {
             for (int j = 0; j < 8; j++)
