@@ -2,8 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+// TODO: взятие на проходе
+// TODO: рокировка
+
 public class BoardController : MonoBehaviour
 {
+    public delegate void Win(bool turn);
+    public event Win win;
+
     public static BoardController Instance { get; set; }
     private bool[,]             _allowedMoves { get; set; }
 
@@ -26,11 +32,18 @@ public class BoardController : MonoBehaviour
     private Piece               _selectedPiece;
     private List<GameObject>    _pieces = new List<GameObject>();
     private bool                _isWhiteTurn = true;
+    private bool                _isEndGame = false;
+
+    private void Awake()
+    {
+        Instance = this;
+    }
 
     void Start()
     {
-        Instance = this;
         _camera = Camera.main;
+
+        GameMenuController.Instance.restartGame += Restart;
 
         SpawnAllPieces();
         CreateMoveHighligts();
@@ -38,6 +51,9 @@ public class BoardController : MonoBehaviour
 
     void Update()
     {
+        if (_isEndGame)
+            return;
+
         UpdateSelection();
 
         if (Input.GetMouseButtonDown(0))
@@ -227,11 +243,18 @@ public class BoardController : MonoBehaviour
         return new Vector3(x, 0f, y);
     }
 
-    private void EndGame()
+    private void Restart()
     {
         DestroyAllPieces();
+        _isEndGame = false;
         _isWhiteTurn = true;
         SpawnAllPieces();
         DisableMoveHighligts();
+    }
+
+    private void EndGame()
+    {
+        _isEndGame = true;
+        win?.Invoke(_isWhiteTurn);
     }
 }
