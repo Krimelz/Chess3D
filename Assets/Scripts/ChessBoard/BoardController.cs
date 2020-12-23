@@ -3,24 +3,26 @@ using System.Collections.Generic;
 using UnityEngine;
 
 // TODO: взятие на проходе
-// TODO: рокировка
 
 public class BoardController : MonoBehaviour
 {
-    public delegate void Win(bool turn);
-    public event Win win;
-
     public static BoardController Instance { get; set; }
-    private bool[,]             _allowedMoves { get; set; }
+
+    public delegate void DelBool(bool turn);
+    public delegate void DelVoid();
+
+    public event DelBool        win;
+    public event DelVoid        changePawn;
 
     [SerializeField]
-    private GameObject           _highlihgt;
+    private GameObject          _highlihgt;
     [SerializeField]
-    private List<GameObject>     _piecesPrefabs;
+    private List<GameObject>    _piecesPrefabs;
 
     [SerializeField]
-    public GameObject           _moveHighlightPrefab;
+    private GameObject          _moveHighlightPrefab;
     private GameObject[,]       _moveHighlights = new GameObject[8, 8];
+    private bool[,]             _allowedMoves { get; set; }
 
     private Camera              _camera;
     private Ray                 _ray;
@@ -32,7 +34,7 @@ public class BoardController : MonoBehaviour
     private Piece               _selectedPiece;
     private List<GameObject>    _pieces = new List<GameObject>();
     private bool                _isWhiteTurn = true;
-    private bool                _isEndGame = false;
+    private bool                _GameIsPaused = false;
 
     private void Awake()
     {
@@ -43,7 +45,8 @@ public class BoardController : MonoBehaviour
     {
         _camera = Camera.main;
 
-        GameMenuController.Instance.restartGame += Restart;
+        GameMenuController.Instance.restartGame += RestartGame;
+        GameMenuController.Instance.changePawn += ChangePawn;
 
         SpawnAllPieces();
         CreateMoveHighligts();
@@ -51,7 +54,7 @@ public class BoardController : MonoBehaviour
 
     void Update()
     {
-        if (_isEndGame)
+        if (_GameIsPaused)
             return;
 
         UpdateSelection();
@@ -120,6 +123,13 @@ public class BoardController : MonoBehaviour
                 Destroy(p.gameObject);
             }
 
+            if (_selectedPiece.GetType() == typeof(Pawn) && p == null && y == 7 || y == 0)
+            {
+                changePawn?.Invoke();
+                _GameIsPaused = true;
+                return;
+            }
+
             chessboard[_selectedPiece.Position.x, _selectedPiece.Position.y] = null;
             _selectedPiece.transform.position = CalcSpaceCoords(x, y);
             _selectedPiece.Position = new Vector2Int(x, y);
@@ -130,6 +140,39 @@ public class BoardController : MonoBehaviour
         DisableMoveHighligts();
 
         _selectedPiece = null;
+    }
+
+    void ChangePawn(int pieceNumber)
+    {
+        _GameIsPaused = false;
+
+        if (!_selectedPiece.isWhite)
+        {
+            pieceNumber += 6;
+        }
+
+        // удаляю фигуру из списка
+        _pieces.Remove(_selectedPiece.gameObject);
+        // спавню новую фигуру
+        SpawnPiece(pieceNumber, _selectedPiece.Position.x, _selectedPiece.Position.y);
+        // уничтожаю объект старой фигуры
+        Destroy(_selectedPiece.gameObject);
+
+        // выбираю новую фигуру с доски
+        _selectedPiece = chessboard[_selectedPiece.Position.x, _selectedPiece.Position.y];
+        // обнуляю клетку, из которой ходит фигрура
+        chessboard[_selectedPiece.Position.x, _selectedPiece.Position.y] = null;
+        // перемещаю
+        _selectedPiece.transform.position = CalcSpaceCoords(_selection.x, _selection.y);
+        // присваиваю объекту фигуры новые координаты
+        _selectedPiece.Position = new Vector2Int(_selection.x, _selection.y);
+        // присваиваю фигуру клетке, в которую походил
+        chessboard[_selection.x, _selection.y] = _selectedPiece; 
+
+        _isWhiteTurn = !_isWhiteTurn;
+
+        DisableMoveHighligts();
+        _selectedPiece = null; // обнуляю выбранную фигуру
     }
 
     void SpawnPiece(int index, int x, int y)
@@ -243,10 +286,10 @@ public class BoardController : MonoBehaviour
         return new Vector3(x, 0f, y);
     }
 
-    private void Restart()
+    private void RestartGame()
     {
         DestroyAllPieces();
-        _isEndGame = false;
+        _GameIsPaused = false;
         _isWhiteTurn = true;
         SpawnAllPieces();
         DisableMoveHighligts();
@@ -254,7 +297,7 @@ public class BoardController : MonoBehaviour
 
     private void EndGame()
     {
-        _isEndGame = true;
+        _GameIsPaused = true;
         win?.Invoke(_isWhiteTurn);
     }
 }

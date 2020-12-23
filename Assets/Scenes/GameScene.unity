@@ -270,7 +270,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 228234744}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1669816634}
+        m_TargetAssemblyTypeName: GameMenuController, Assembly-CSharp
+        m_MethodName: GetNewPieceNumber
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 1
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &228234744
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -917,7 +929,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 782664431}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1669816634}
+        m_TargetAssemblyTypeName: GameMenuController, Assembly-CSharp
+        m_MethodName: GetNewPieceNumber
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 2
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &782664431
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1037,7 +1061,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1226498280}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1669816634}
+        m_TargetAssemblyTypeName: GameMenuController, Assembly-CSharp
+        m_MethodName: GetNewPieceNumber
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 4
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1226498280
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1105,8 +1141,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c4470c3d27905d54594333999cff3a97, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _gameMenu: {fileID: 0}
-  _winText: {fileID: 0}
+  _gameMenu: {fileID: 1103560985270540256}
+  _newPieces: {fileID: 556862355}
+  _winText: {fileID: 4419258819447215530}
 --- !u!4 &1669816635
 Transform:
   m_ObjectHideFlags: 0
@@ -1413,7 +1450,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 2066813756}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1669816634}
+        m_TargetAssemblyTypeName: GameMenuController, Assembly-CSharp
+        m_MethodName: GetNewPieceNumber
+        m_Mode: 3
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 3
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &2066813756
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+// TODO: рокировка
+
 public class King : Piece
 {
     public override bool[,] PossibleMove()
@@ -28,6 +30,24 @@ public class King : Piece
                 }
             }
         }
+
+        if (isWhite)
+        {
+            if (Position.x == 5 && Position.y == 1) // && ни разу не ходила
+            {
+                // проверка вверх
+                // проверка вниз
+            }
+        }
+        else
+        {
+            if (Position.x == 5 && Position.y == 7) // && ни разу не ходила
+            {
+                // проверка вверх
+                // проверка вниз
+            }
+        }
+        
 
         moves[Position.x, Position.y] = false;
 
