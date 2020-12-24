@@ -53,4 +53,24 @@ public class King : Piece
 
         return moves;
     }
+
+    public override bool[,] AttackedSpaces()
+    {
+        bool[,] attackedSpaces = new bool[8, 8];
+
+        for (int i = -1; i <= 1; i++)
+        {
+            for (int j = -1; j <= 1; j++)
+            {
+                if (Position.x + i >= 0 && Position.x + i <= 7 && Position.y + j >= 0 && Position.y + j <= 7)
+                {
+                    attackedSpaces[Position.x + i, Position.y + j] = true;
+                }
+            }
+        }
+
+        attackedSpaces[Position.x, Position.y] = false;
+
+        return attackedSpaces;
+    }
 }

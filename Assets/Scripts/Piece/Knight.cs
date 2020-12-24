@@ -20,6 +20,22 @@ public class Knight : Piece
         return moves;
     }
 
+    public override bool[,] AttackedSpaces()
+    {
+        bool[,] attackedSpaces = new bool[8, 8];
+
+        AttackedSpace(Position.x + 2, Position.y + 1, ref attackedSpaces);
+        AttackedSpace(Position.x + 2, Position.y - 1, ref attackedSpaces);
+        AttackedSpace(Position.x - 2, Position.y + 1, ref attackedSpaces);
+        AttackedSpace(Position.x - 2, Position.y - 1, ref attackedSpaces);
+        AttackedSpace(Position.x + 1, Position.y + 2, ref attackedSpaces);
+        AttackedSpace(Position.x + 1, Position.y - 2, ref attackedSpaces);
+        AttackedSpace(Position.x - 1, Position.y + 2, ref attackedSpaces);
+        AttackedSpace(Position.x - 1, Position.y - 2, ref attackedSpaces);
+
+        return attackedSpaces;
+    }
+
     private void Move(int x, int y, ref bool[,] moves)
     {
         if (x >= 0 && x <= 7 && y >= 0 && y <= 7)
@@ -34,6 +50,14 @@ public class Knight : Piece
             {
                 moves[x, y] = true;
             }
+        }
+    }
+
+    private void AttackedSpace(int x, int y, ref bool[,] attackedSpaces)
+    {
+        if (x >= 0 && x <= 7 && y >= 0 && y <= 7)
+        {
+            attackedSpaces[x, y] = true;
         }
     }
 }

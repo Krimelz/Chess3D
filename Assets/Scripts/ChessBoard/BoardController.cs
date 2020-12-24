@@ -38,6 +38,10 @@ public class BoardController : MonoBehaviour
     private bool                _isWhiteTurn = true;
     private bool                _GameIsPaused = false;
 
+    private Piece _whiteKing;
+    private Piece _blackKing;
+    private bool _kingIsAttacked = false;
+
     private void Awake()
     {
         Instance = this;
@@ -54,12 +58,61 @@ public class BoardController : MonoBehaviour
         CreateMoveHighligts();
     }
 
+    private void CheckKing()
+    {
+        SpacesUnderAttack();
+
+        if (_isWhiteTurn)
+        {
+            if (_spacesUnderAttack[_whiteKing.Position.x, _whiteKing.Position.y])
+            {
+                _kingIsAttacked = true;
+                SelectPiece(_whiteKing.Position.x, _whiteKing.Position.y);
+            }
+        }
+        else
+        {
+            if (_spacesUnderAttack[_blackKing.Position.x, _blackKing.Position.y])
+            {
+                _kingIsAttacked = true;
+                SelectPiece(_blackKing.Position.x, _blackKing.Position.y);
+            }
+        }
+
+        
+    }
+
+    private void KingMoves()
+    {
+        int c = 0;
+        for (int i = _selectedPiece.Position.x - 1; i <= _selectedPiece.Position.x + 1; i++)
+        {
+            for (int j = _selectedPiece.Position.y - 1; j <= _selectedPiece.Position.y + 1; j++)
+            {
+                if (i >= 0 && i < 8 && j >= 0 && j < 8)
+                {
+                    if (_spacesUnderAttack[i, j])
+                    {
+                        _allowedMoves[i, j] = false;
+                        c++;
+                    }
+                }
+            }
+        }
+
+        if (c == 8)
+            EndGame();
+    }
+
     void Update()
     {
         if (_GameIsPaused)
             return;
 
         UpdateSelection();
+
+        if (!_kingIsAttacked)
+            CheckKing();
 
         if (Input.GetMouseButtonDown(0))
         {
@@ -93,6 +146,21 @@ public class BoardController : MonoBehaviour
         }
     }
 
+    bool HasMoves()
+    {
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                if (_allowedMoves[i, j])
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
     void SelectPiece(int x, int y)
     {
         if (chessboard[x, y] == null)
@@ -102,39 +170,14 @@ public class BoardController : MonoBehaviour
             return;
 
         _allowedMoves = chessboard[x, y].PossibleMove();
-        bool hasMoves = false;
-
-        for (int i = 0; i < 8; i++)
-        {
-            for (int j = 0; j < 8; j++)
-            {
-                if (_allowedMoves[i, j])
-                {
-                    hasMoves = true;
-                }
-            }
-        }
-
-        if (!hasMoves)
-            return;
-
         _selectedPiece = chessboard[x, y];
 
         if (_selectedPiece.GetType() == typeof(King))
         {
-            SpacesUnderAttack();
-
-            for (int i = _selectedPiece.Position.x - 1; i <= _selectedPiece.Position.x + 1; i++)
-            {
-                for (int j = _selectedPiece.Position.y - 1; j <= _selectedPiece.Position.y + 1; j++)
-                {
-                    if (i >= 0 && i < 8 && j >= 0 && j < 8)
-                    {
-                        if (_spacesUnderAttack[i, j])
-                            _allowedMoves[i, j] = false;
-                    }
-                }
-            }
+            if (HasMoves())
+                KingMoves();
+            else
+                EndGame();
         }
 
         EnableMoveHighligts();
@@ -200,12 +243,30 @@ public class BoardController : MonoBehaviour
             chessboard[_selectedPiece.Position.x, _selectedPiece.Position.y] = null;
             _selectedPiece.transform.position = CalcSpaceCoords(x, y);
             _selectedPiece.Position = new Vector2Int(x, y);
+
+            if (_selectedPiece.GetType() == typeof(King))
+            {
+                if (_isWhiteTurn)
+                {
+                    _whiteKing.Position = _selectedPiece.Position;
+                }
+                else
+                {
+                    _blackKing.Position = _selectedPiece.Position;
+                }
+            }
+
             chessboard[x, y] = _selectedPiece;
             _isWhiteTurn = !_isWhiteTurn;
+            _kingIsAttacked = false;
+        }
+
+        if (_kingIsAttacked)
+        {
+            return;    
         }
 
         DisableMoveHighligts();
-
         _selectedPiece = null;
     }
 
@@ -276,6 +337,15 @@ public class BoardController : MonoBehaviour
         chessboard[x, y] = piece.GetComponent<Piece>();
         chessboard[x, y].Position = new Vector2Int(x, y);
         _pieces.Add(piece);
+
+        if (index == 5)
+        {
+            _whiteKing = chessboard[x, y];
+        }
+        else if (index == 11)
+        {
+            _blackKing = chessboard[x, y];
+        }
     }
 
     void SpawnAllPieces()
