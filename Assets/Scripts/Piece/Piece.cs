@@ -13,6 +13,6 @@ public abstract class Piece : MonoBehaviour
 
     public virtual bool[,] AttackedSpaces()
     {
-        return PossibleMove();
+        return new bool[8, 8];
     }
 }
