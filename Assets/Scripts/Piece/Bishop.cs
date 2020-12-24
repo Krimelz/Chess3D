@@ -145,7 +145,7 @@ public class Bishop : Piece
 
             p = BoardController.Instance.chessboard[i, j];
 
-            if (p == null)
+            if (p == null || p.GetType() == typeof(King))
             {
                 attackedSpaces[i, j] = true;
             }
@@ -169,7 +169,7 @@ public class Bishop : Piece
 
             p = BoardController.Instance.chessboard[i, j];
 
-            if (p == null)
+            if (p == null || p.GetType() == typeof(King))
             {
                 attackedSpaces[i, j] = true;
             }
@@ -193,12 +193,12 @@ public class Bishop : Piece
 
             p = BoardController.Instance.chessboard[i, j];
 
-            if (p == null)
+            if (p == null || p.GetType() == typeof(King))
             {
                 attackedSpaces[i, j] = true;
             }
             else
-            { 
+            {
                 attackedSpaces[i, j] = true;
                 break;
             }
@@ -217,7 +217,7 @@ public class Bishop : Piece
 
             p = BoardController.Instance.chessboard[i, j];
 
-            if (p == null)
+            if (p == null || p.GetType() == typeof(King))
             {
                 attackedSpaces[i, j] = true;
             }

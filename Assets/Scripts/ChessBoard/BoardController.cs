@@ -58,51 +58,7 @@ public class BoardController : MonoBehaviour
         CreateMoveHighligts();
     }
 
-    private void CheckKing()
-    {
-        SpacesUnderAttack();
 
-        if (_isWhiteTurn)
-        {
-            if (_spacesUnderAttack[_whiteKing.Position.x, _whiteKing.Position.y])
-            {
-                _kingIsAttacked = true;
-                SelectPiece(_whiteKing.Position.x, _whiteKing.Position.y);
-            }
-        }
-        else
-        {
-            if (_spacesUnderAttack[_blackKing.Position.x, _blackKing.Position.y])
-            {
-                _kingIsAttacked = true;
-                SelectPiece(_blackKing.Position.x, _blackKing.Position.y);
-            }
-        }
-
-        
-    }
-
-    private void KingMoves()
-    {
-        int c = 0;
-        for (int i = _selectedPiece.Position.x - 1; i <= _selectedPiece.Position.x + 1; i++)
-        {
-            for (int j = _selectedPiece.Position.y - 1; j <= _selectedPiece.Position.y + 1; j++)
-            {
-                if (i >= 0 && i < 8 && j >= 0 && j < 8)
-                {
-                    if (_spacesUnderAttack[i, j])
-                    {
-                        _allowedMoves[i, j] = false;
-                        c++;
-                    }
-                }
-            }
-        }
-
-        if (c == 8)
-            EndGame();
-    }
 
     void Update()
     {
@@ -110,9 +66,6 @@ public class BoardController : MonoBehaviour
             return;
 
         UpdateSelection();
-
-        if (!_kingIsAttacked)
-            CheckKing();
 
         if (Input.GetMouseButtonDown(0))
         {
@@ -125,6 +78,7 @@ public class BoardController : MonoBehaviour
                 else
                 {
                     MovePiece(_selection.x, _selection.y);
+                    CheckKing();
                 }
             }
         }
@@ -171,14 +125,6 @@ public class BoardController : MonoBehaviour
 
         _allowedMoves = chessboard[x, y].PossibleMove();
         _selectedPiece = chessboard[x, y];
-
-        if (_selectedPiece.GetType() == typeof(King))
-        {
-            if (HasMoves())
-                KingMoves();
-            else
-                EndGame();
-        }
 
         EnableMoveHighligts();
     }
@@ -262,9 +208,7 @@ public class BoardController : MonoBehaviour
         }
 
         if (_kingIsAttacked)
-        {
             return;    
-        }
 
         DisableMoveHighligts();
         _selectedPiece = null;
@@ -291,6 +235,55 @@ public class BoardController : MonoBehaviour
                             if (attackedSpaces[i, j])
                                 _spacesUnderAttack[i, j] = true;
                         }
+                    }
+                }
+            }
+        }
+    }
+
+    private void CheckKing()
+    {
+        SpacesUnderAttack();
+
+        if (_isWhiteTurn)
+        {
+            if (_spacesUnderAttack[_whiteKing.Position.x, _whiteKing.Position.y])
+            {
+                _kingIsAttacked = true;
+                SelectPiece(_whiteKing.Position.x, _whiteKing.Position.y);
+
+                KingMoves();
+
+                if (!HasMoves())
+                    EndGame();
+            }
+        }
+        else
+        {
+            if (_spacesUnderAttack[_blackKing.Position.x, _blackKing.Position.y])
+            {
+                _kingIsAttacked = true;
+                SelectPiece(_blackKing.Position.x, _blackKing.Position.y);
+
+                KingMoves();
+
+                if (!HasMoves())
+                    EndGame();
+            }
+        }  
+    }
+
+    private void KingMoves()
+    {
+        for (int i = _selectedPiece.Position.x - 1; i <= _selectedPiece.Position.x + 1; i++)
+        {
+            for (int j = _selectedPiece.Position.y - 1; j <= _selectedPiece.Position.y + 1; j++)
+            {
+                if (i >= 0 && i < 8 && j >= 0 && j < 8)
+                {
+                    if (_spacesUnderAttack[i, j])
+                    {
+                        _allowedMoves[i, j] = false;
                     }
                 }
             }
@@ -467,6 +460,6 @@ public class BoardController : MonoBehaviour
     private void EndGame()
     {
         _GameIsPaused = true;
-        win?.Invoke(_isWhiteTurn);
+        win?.Invoke(!_isWhiteTurn);
     }
 }
