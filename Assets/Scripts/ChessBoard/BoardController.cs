@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+// TODO: Находится ли король под боем
+
 public class BoardController : MonoBehaviour
 {
     public static BoardController Instance { get; set; }
@@ -17,11 +19,12 @@ public class BoardController : MonoBehaviour
     [SerializeField]
     private List<GameObject>    _piecesPrefabs;
 
-    public int[]                Passant { get; set; }
+    public int[]                EnPassant { get; set; }
     [SerializeField]
     private GameObject          _moveHighlightPrefab;
     private GameObject[,]       _moveHighlights;
     private bool[,]             _allowedMoves { get; set; }
+    private bool[,]             _spacesUnderAttack { get; set; }
 
     private Camera              _camera;
     private Ray                 _ray;
@@ -99,7 +102,40 @@ public class BoardController : MonoBehaviour
             return;
 
         _allowedMoves = chessboard[x, y].PossibleMove();
+        bool hasMoves = false;
+
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                if (_allowedMoves[i, j])
+                {
+                    hasMoves = true;
+                }
+            }
+        }
+
+        if (!hasMoves)
+            return;
+
         _selectedPiece = chessboard[x, y];
+
+        if (_selectedPiece.GetType() == typeof(King))
+        {
+            SpacesUnderAttack();
+
+            for (int i = _selectedPiece.Position.x - 1; i <= _selectedPiece.Position.x + 1; i++)
+            {
+                for (int j = _selectedPiece.Position.y - 1; j <= _selectedPiece.Position.y + 1; j++)
+                {
+                    if (i >= 0 && i < 8 && j >= 0 && j < 8)
+                    {
+                        if (_spacesUnderAttack[i, j])
+                            _allowedMoves[i, j] = false;
+                    }
+                }
+            }
+        }
 
         EnableMoveHighligts();
     }
@@ -120,6 +156,7 @@ public class BoardController : MonoBehaviour
 
                 _pieces.Remove(p.gameObject);
                 Destroy(p.gameObject);
+                p = null;
             }
 
             if (_selectedPiece.GetType() == typeof(Pawn))
@@ -131,7 +168,7 @@ public class BoardController : MonoBehaviour
                     return;
                 }
 
-                if (x == Passant[0] && y == Passant[1])
+                if (x == EnPassant[0] && y == EnPassant[1])
                 {
                     if (_isWhiteTurn)
                     {
@@ -146,17 +183,17 @@ public class BoardController : MonoBehaviour
                     Destroy(p.gameObject);
                 }
 
-                Passant[0] = -1;
-                Passant[1] = -1;
+                EnPassant[0] = -1;
+                EnPassant[1] = -1;
                 if (_selectedPiece.Position.y == 1 && y == 3)
                 {
-                    Passant[0] = x;
-                    Passant[1] = y - 1;
+                    EnPassant[0] = x;
+                    EnPassant[1] = y - 1;
                 }
                 else if (_selectedPiece.Position.y == 6 && y == 4)
                 {
-                    Passant[0] = x;
-                    Passant[1] = y + 1;
+                    EnPassant[0] = x;
+                    EnPassant[1] = y + 1;
                 }
             }
 
@@ -170,6 +207,33 @@ public class BoardController : MonoBehaviour
         DisableMoveHighligts();
 
         _selectedPiece = null;
+    }
+
+    private void SpacesUnderAttack()
+    {
+        _spacesUnderAttack = new bool[8, 8];
+
+        for (int x = 0; x < 8; x++)
+        {
+            for (int y = 0; y < 8; y++)
+            {
+                Piece p = chessboard[x, y];
+
+                if (p != null && p.isWhite != _isWhiteTurn)
+                {
+                    bool[,] attackedSpaces = p.AttackedSpaces();
+
+                    for (int i = 0; i < 8; i++)
+                    {
+                        for (int j = 0; j < 8; j++)
+                        {
+                            if (attackedSpaces[i, j])
+                                _spacesUnderAttack[i, j] = true;
+                        }
+                    }
+                }
+            }
+        }
     }
 
     void ChangePawn(int pieceNumber)
@@ -218,7 +282,7 @@ public class BoardController : MonoBehaviour
     {
         _pieces = new List<GameObject>();
         chessboard = new Piece[8, 8];
-        Passant = new int[] { -1, -1 };
+        EnPassant = new int[] { -1, -1 };
         // --- White --- //
 
         // Pawns
