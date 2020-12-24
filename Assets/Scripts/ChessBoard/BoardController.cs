@@ -58,8 +58,6 @@ public class BoardController : MonoBehaviour
         CreateMoveHighligts();
     }
 
-
-
     void Update()
     {
         if (_GameIsPaused)
@@ -192,6 +190,12 @@ public class BoardController : MonoBehaviour
 
             if (_selectedPiece.GetType() == typeof(King))
             {
+                if (!_selectedPiece.wasWalking)
+                {
+                    _selectedPiece.wasWalking = true;
+                    Castling();
+                }
+
                 if (_isWhiteTurn)
                 {
                     _whiteKing.Position = _selectedPiece.Position;
@@ -202,6 +206,7 @@ public class BoardController : MonoBehaviour
                 }
             }
 
+            _selectedPiece.wasWalking = true;
             chessboard[x, y] = _selectedPiece;
             _isWhiteTurn = !_isWhiteTurn;
             _kingIsAttacked = false;
@@ -212,6 +217,48 @@ public class BoardController : MonoBehaviour
 
         DisableMoveHighligts();
         _selectedPiece = null;
+    }
+
+    private void Castling()
+    {
+        if (_isWhiteTurn)
+        {
+            if (_selection.x == 6)
+            {
+                chessboard[5, 0] = chessboard[7, 0];
+                chessboard[5, 0].Position = new Vector2Int(5, 0);
+                chessboard[5, 0].wasWalking = true;
+                chessboard[5, 0].transform.position = CalcSpaceCoords(5, 0);
+                chessboard[7, 0] = null;
+            }
+            else if (_selection.x == 2)
+            {
+                chessboard[3, 0] = chessboard[0, 0];
+                chessboard[3, 0].Position = new Vector2Int(5, 0);
+                chessboard[3, 0].wasWalking = true;
+                chessboard[3, 0].transform.position = CalcSpaceCoords(3, 0);
+                chessboard[0, 0] = null;
+            }
+        }
+        else
+        {
+            if (_selection.x == 6)
+            {
+                chessboard[5, 7] = chessboard[7, 7];
+                chessboard[5, 7].Position = new Vector2Int(5, 7);
+                chessboard[5, 7].wasWalking = true;
+                chessboard[5, 7].transform.position = CalcSpaceCoords(5, 7);
+                chessboard[7, 7] = null;
+            }
+            else if (_selection.x == 2)
+            {
+                chessboard[3, 7] = chessboard[0, 7];
+                chessboard[3, 7].Position = new Vector2Int(3, 7);
+                chessboard[3, 7].wasWalking = true;
+                chessboard[3, 7].transform.position = CalcSpaceCoords(3, 7);
+                chessboard[3, 7] = null;
+            }
+        }
     }
 
     private void SpacesUnderAttack()
@@ -314,6 +361,7 @@ public class BoardController : MonoBehaviour
         _selectedPiece.transform.position = CalcSpaceCoords(_selection.x, _selection.y);
         // присваиваю объекту фигуры новые координаты
         _selectedPiece.Position = new Vector2Int(_selection.x, _selection.y);
+        _selectedPiece.wasWalking = true;
         // присваиваю фигуру клетке, в которую походил
         chessboard[_selection.x, _selection.y] = _selectedPiece; 
 
@@ -459,6 +507,7 @@ public class BoardController : MonoBehaviour
 
     private void EndGame()
     {
+        DisableMoveHighligts();
         _GameIsPaused = true;
         win?.Invoke(!_isWhiteTurn);
     }

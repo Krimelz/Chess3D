@@ -33,18 +33,94 @@ public class King : Piece
 
         if (isWhite)
         {
-            if (Position.x == 5 && Position.y == 1) // && ни разу не ходила
+            if (!wasWalking) 
             {
                 // Короткая рокировка
+                bool empty = true;
+                for (int i = Position.x + 1; i <= 6; i++)
+                {
+                    p = BoardController.Instance.chessboard[i, 0];
+
+                    if (p != null)
+                    {
+                        empty = false;
+                        break;
+                    }
+                }
+
+                p = BoardController.Instance.chessboard[7, 0];
+
+                if (p != null && p.GetType() == typeof(Rook) && !p.wasWalking && empty)
+                {
+                    moves[6, 0] = true;
+                }
+
+                empty = true;
+
                 // Длинная рокировка
+                for (int i = Position.x - 1; i >= 1; i--)
+                {
+                    p = BoardController.Instance.chessboard[i, 0];
+
+                    if (p != null)
+                    {
+                        empty = false;
+                        break;
+                    }
+                }
+
+                p = BoardController.Instance.chessboard[0, 0];
+
+                if (p != null && p.GetType() == typeof(Rook) && !p.wasWalking && empty)
+                {
+                    moves[2, 0] = true;
+                }
             }
         }
         else
         {
-            if (Position.x == 5 && Position.y == 7) // && ни разу не ходила
+            if (!wasWalking) 
             {
                 // Короткая рокировка
+                bool empty = true;
+                for (int i = Position.x + 1; i <= 6; i++)
+                {
+                    p = BoardController.Instance.chessboard[i, 7];
+
+                    if (p != null)
+                    {
+                        empty = false;
+                        break;
+                    }
+                }
+
+                p = BoardController.Instance.chessboard[7, 7];
+
+                if (p != null && p.GetType() == typeof(Rook) && !p.wasWalking && empty)
+                {
+                    moves[6, 7] = true;
+                }
+
+                empty = true;
+
                 // Длинная рокировка
+                for (int i = Position.x - 1; i >= 1; i--)
+                {
+                    p = BoardController.Instance.chessboard[i, 7];
+
+                    if (p != null)
+                    {
+                        empty = false;
+                        break;
+                    }
+                }
+
+                p = BoardController.Instance.chessboard[0, 7];
+
+                if (p != null && p.GetType() == typeof(Rook) && !p.wasWalking && empty)
+                {
+                    moves[2, 7] = true;
+                }
             }
         }
         
