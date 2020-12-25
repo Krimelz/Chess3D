@@ -14,10 +14,14 @@ public class GameMenuController : MonoBehaviour
     [SerializeField]
     private Text                    _winText;
 
-    public delegate void Restart();
-    public delegate void ChangePawn(int pieceNumber);
-    public event Restart restartGame;
-    public event ChangePawn changePawn;
+    public delegate void DelVoid();
+    public delegate void DelBool(bool isPaused);
+    public delegate void DelInt(int pieceNumber);
+    public event DelVoid restartGame;
+    public event DelBool gamePause;
+    public event DelInt changePawn;
+
+    private bool _pause = false;
 
     private void Awake()
     {
@@ -28,6 +32,16 @@ public class GameMenuController : MonoBehaviour
     {
         BoardController.Instance.win += PrintWinner;
         BoardController.Instance.changePawn += EnableChangePawn;
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            _pause = !_pause;
+            _gameMenu.SetActive(_pause);
+            gamePause.Invoke(_pause);
+        }
     }
 
     public void EnableChangePawn()

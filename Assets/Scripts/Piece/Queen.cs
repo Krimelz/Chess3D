@@ -223,7 +223,7 @@ public class Queen : Piece
         {
             p = BoardController.Instance.chessboard[Position.x, i];
 
-            if (p == null)
+            if (p == null || p.GetType() == typeof(King))
             {
                 attackedSpaces[Position.x, i] = true;
             }
@@ -239,7 +239,7 @@ public class Queen : Piece
         {
             p = BoardController.Instance.chessboard[Position.x, i];
 
-            if (p == null)
+            if (p == null || p.GetType() == typeof(King))
             {
                 attackedSpaces[Position.x, i] = true;
             }
@@ -255,7 +255,7 @@ public class Queen : Piece
         {
             p = BoardController.Instance.chessboard[i, Position.y];
 
-            if (p == null)
+            if (p == null || p.GetType() == typeof(King))
             {
                 attackedSpaces[i, Position.y] = true;
             }
@@ -271,7 +271,7 @@ public class Queen : Piece
         {
             p = BoardController.Instance.chessboard[i, Position.y];
 
-            if (p == null)
+            if (p == null || p.GetType() == typeof(King))
             {
                 attackedSpaces[i, Position.y] = true;
             }
@@ -296,7 +296,7 @@ public class Queen : Piece
 
             p = BoardController.Instance.chessboard[i, j];
 
-            if (p == null)
+            if (p == null || p.GetType() == typeof(King))
             {
                 attackedSpaces[i, j] = true;
             }
@@ -321,7 +321,7 @@ public class Queen : Piece
 
             p = BoardController.Instance.chessboard[i, j];
 
-            if (p == null)
+            if (p == null || p.GetType() == typeof(King))
             {
                 attackedSpaces[i, j] = true;
             }
@@ -346,7 +346,7 @@ public class Queen : Piece
 
             p = BoardController.Instance.chessboard[i, j];
 
-            if (p == null)
+            if (p == null || p.GetType() == typeof(King))
             {
                 attackedSpaces[i, j] = true;
             }
@@ -371,7 +371,7 @@ public class Queen : Piece
 
             p = BoardController.Instance.chessboard[i, j];
 
-            if (p == null)
+            if (p == null || p.GetType() == typeof(King))
             {
                 attackedSpaces[i, j] = true;
             }

@@ -38,9 +38,9 @@ public class BoardController : MonoBehaviour
     private bool                _isWhiteTurn = true;
     private bool                _GameIsPaused = false;
 
-    private Piece _whiteKing;
-    private Piece _blackKing;
-    private bool _kingIsAttacked = false;
+    private Piece               _whiteKing;
+    private Piece               _blackKing;
+    private bool                _kingIsAttacked = false;
 
     private void Awake()
     {
@@ -53,6 +53,7 @@ public class BoardController : MonoBehaviour
 
         GameMenuController.Instance.restartGame += RestartGame;
         GameMenuController.Instance.changePawn += ChangePawn;
+        GameMenuController.Instance.gamePause += Pause;
 
         SpawnAllPieces();
         CreateMoveHighligts();
@@ -123,6 +124,14 @@ public class BoardController : MonoBehaviour
 
         _allowedMoves = chessboard[x, y].PossibleMove();
         _selectedPiece = chessboard[x, y];
+
+        if (_selectedPiece.GetType() == typeof(King))
+        {
+            KingMoves();
+
+            if (!HasMoves())
+                EndGame();
+        }
 
         EnableMoveHighligts();
     }
@@ -298,11 +307,6 @@ public class BoardController : MonoBehaviour
             {
                 _kingIsAttacked = true;
                 SelectPiece(_whiteKing.Position.x, _whiteKing.Position.y);
-
-                KingMoves();
-
-                if (!HasMoves())
-                    EndGame();
             }
         }
         else
@@ -311,11 +315,6 @@ public class BoardController : MonoBehaviour
             {
                 _kingIsAttacked = true;
                 SelectPiece(_blackKing.Position.x, _blackKing.Position.y);
-
-                KingMoves();
-
-                if (!HasMoves())
-                    EndGame();
             }
         }  
     }
@@ -494,6 +493,11 @@ public class BoardController : MonoBehaviour
     Vector3 CalcSpaceCoords(int x, int y)
     {
         return new Vector3(x, 0f, y);
+    }
+
+    private void Pause(bool isPaused)
+    {
+        _GameIsPaused = isPaused;
     }
 
     private void RestartGame()

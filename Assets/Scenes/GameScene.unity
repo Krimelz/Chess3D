@@ -519,6 +519,7 @@ MonoBehaviour:
   - {fileID: 7043365071066418629, guid: 2059c08d07740144d92aa7dc13adf43b, type: 3}
   _moveHighlightPrefab: {fileID: 1286990052966202235, guid: 10f6386b3a6a4a646b270d205ed049c9, type: 3}
   _selection: {x: 0, y: 0}
+  _GameIsPaused: 0
 --- !u!65 &478620445
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -2028,7 +2029,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: WIN!!!
+  m_Text: GAME MENU
 --- !u!1 &4622604158677567104
 GameObject:
   m_ObjectHideFlags: 0
