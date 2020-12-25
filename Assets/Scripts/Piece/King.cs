@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-// TODO: рокировка
-
 public class King : Piece
 {
     public override bool[,] PossibleMove()

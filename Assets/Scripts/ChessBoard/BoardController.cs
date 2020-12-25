@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-// TODO: Находится ли король под боем
+// TODO: Вынести в функцию и исправить взятие на проходе: Находится ли король под боем
 
 public class BoardController : MonoBehaviour
 {
@@ -20,6 +20,7 @@ public class BoardController : MonoBehaviour
     private List<GameObject>    _piecesPrefabs;
 
     public int[]                EnPassant { get; set; }
+    public bool                 EnPassantColor { get; set; }
     [SerializeField]
     private GameObject          _moveHighlightPrefab;
     private GameObject[,]       _moveHighlights;
@@ -114,7 +115,7 @@ public class BoardController : MonoBehaviour
 
         return false;
     }
-    void SelectPiece(int x, int y) // <---
+    void SelectPiece(int x, int y) 
     {
         if (chessboard[x, y] == null)
             return;
@@ -128,9 +129,12 @@ public class BoardController : MonoBehaviour
         if (_selectedPiece.GetType() == typeof(King))
         {
             KingMoves();
+        }
 
-            if (!HasMoves())
-                EndGame();
+        if (!HasMoves())
+        {
+            _selectedPiece = null;
+            return;
         }
 
         EnableMoveHighligts();
@@ -147,7 +151,6 @@ public class BoardController : MonoBehaviour
                 if (p.GetType() == typeof(King))
                 {
                     EndGame();
-                    return;
                 }
 
                 _pieces.Remove(p.gameObject);
@@ -155,12 +158,13 @@ public class BoardController : MonoBehaviour
                 p = null;
             }
 
+            // TODO: Вынести в функцию и исправить взятие на проходе
             if (_selectedPiece.GetType() == typeof(Pawn))
             {
                 if (p == null && y == 7 || y == 0)
                 {
                     changePawn?.Invoke();
-                    _GameIsPaused = true;
+                    Pause(true);
                     return;
                 }
 
@@ -175,7 +179,7 @@ public class BoardController : MonoBehaviour
                         p = chessboard[x, y + 1];
                     }
 
-                    _pieces.Remove(p.gameObject);
+                    _pieces.Remove(p.gameObject); // <--------------
                     Destroy(p.gameObject);
                 }
 
@@ -185,11 +189,13 @@ public class BoardController : MonoBehaviour
                 {
                     EnPassant[0] = x;
                     EnPassant[1] = y - 1;
+                    EnPassantColor = true;
                 }
                 else if (_selectedPiece.Position.y == 6 && y == 4)
                 {
                     EnPassant[0] = x;
                     EnPassant[1] = y + 1;
+                    EnPassantColor = false;
                 }
             }
 
@@ -221,8 +227,8 @@ public class BoardController : MonoBehaviour
             _kingIsAttacked = false;
         }
 
-        if (_kingIsAttacked)
-            return;    
+        //if (_kingIsAttacked)
+        //    return;    
 
         DisableMoveHighligts();
         _selectedPiece = null;
@@ -243,7 +249,7 @@ public class BoardController : MonoBehaviour
             else if (_selection.x == 2)
             {
                 chessboard[3, 0] = chessboard[0, 0];
-                chessboard[3, 0].Position = new Vector2Int(5, 0);
+                chessboard[3, 0].Position = new Vector2Int(3, 0);
                 chessboard[3, 0].wasWalking = true;
                 chessboard[3, 0].transform.position = CalcSpaceCoords(3, 0);
                 chessboard[0, 0] = null;
@@ -265,7 +271,7 @@ public class BoardController : MonoBehaviour
                 chessboard[3, 7].Position = new Vector2Int(3, 7);
                 chessboard[3, 7].wasWalking = true;
                 chessboard[3, 7].transform.position = CalcSpaceCoords(3, 7);
-                chessboard[3, 7] = null;
+                chessboard[0, 7] = null;
             }
         }
     }
@@ -288,8 +294,10 @@ public class BoardController : MonoBehaviour
                     {
                         for (int j = 0; j < 8; j++)
                         {
-                            if (attackedSpaces[i, j])
-                                _spacesUnderAttack[i, j] = true;
+                            _spacesUnderAttack[i, j] |= attackedSpaces[i, j];
+
+                            //if (attackedSpaces[i, j])
+                            //    _spacesUnderAttack[i, j] = true;
                         }
                     }
                 }
@@ -306,7 +314,7 @@ public class BoardController : MonoBehaviour
             if (_spacesUnderAttack[_whiteKing.Position.x, _whiteKing.Position.y])
             {
                 _kingIsAttacked = true;
-                SelectPiece(_whiteKing.Position.x, _whiteKing.Position.y);
+                //SelectPiece(_whiteKing.Position.x, _whiteKing.Position.y);
             }
         }
         else
@@ -314,12 +322,12 @@ public class BoardController : MonoBehaviour
             if (_spacesUnderAttack[_blackKing.Position.x, _blackKing.Position.y])
             {
                 _kingIsAttacked = true;
-                SelectPiece(_blackKing.Position.x, _blackKing.Position.y);
+                //SelectPiece(_blackKing.Position.x, _blackKing.Position.y);
             }
         }  
     }
 
-    private void KingMoves()
+    private void KingMoves() // <-----
     {
         for (int i = _selectedPiece.Position.x - 1; i <= _selectedPiece.Position.x + 1; i++)
         {
@@ -336,7 +344,7 @@ public class BoardController : MonoBehaviour
         }
     }
 
-    void ChangePawn(int pieceNumber) // <---
+    void ChangePawn(int pieceNumber)
     {
         _GameIsPaused = false;
 
@@ -514,7 +522,7 @@ public class BoardController : MonoBehaviour
     private void EndGame()
     {
         DisableMoveHighligts();
-        _GameIsPaused = true;
-        win?.Invoke(!_isWhiteTurn);
+        Pause(true);
+        win?.Invoke(_isWhiteTurn);
     }
 }

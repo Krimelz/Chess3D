@@ -519,7 +519,6 @@ MonoBehaviour:
   - {fileID: 7043365071066418629, guid: 2059c08d07740144d92aa7dc13adf43b, type: 3}
   _moveHighlightPrefab: {fileID: 1286990052966202235, guid: 10f6386b3a6a4a646b270d205ed049c9, type: 3}
   _selection: {x: 0, y: 0}
-  _GameIsPaused: 0
 --- !u!65 &478620445
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1307,7 +1306,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 60
+  field of view: 50
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
@@ -1332,13 +1331,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1806537400}
-  m_LocalRotation: {x: 0.36946222, y: -0.60290766, z: 0.36946222, w: 0.60290766}
-  m_LocalPosition: {x: 8, y: 7, z: 3.5}
+  m_LocalRotation: {x: 0.5224985, y: 0, z: 0, w: 0.8526402}
+  m_LocalPosition: {x: 3.5, y: 8.72, z: -1.83}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
-  m_LocalEulerAnglesHint: {x: 63, y: -90, z: 0}
+  m_LocalEulerAnglesHint: {x: 63, y: 0, z: 0}
 --- !u!114 &1806537404
 MonoBehaviour:
   m_ObjectHideFlags: 0

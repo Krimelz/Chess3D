@@ -8,6 +8,7 @@ public class Pawn : Piece
     {
         bool[,] moves = new bool[8, 8];
         int[] enPassant = BoardController.Instance.EnPassant;
+        bool enPassantColor = BoardController.Instance.EnPassantColor;
         Piece p1, p2;
 
         if (isWhite)
@@ -15,7 +16,7 @@ public class Pawn : Piece
             // left
             if (Position.x != 0 && Position.y != 7)
             {
-                if (enPassant[0] == Position.x - 1 && enPassant[1] == Position.y + 1)
+                if (enPassant[0] == Position.x - 1 && enPassant[1] == Position.y + 1 && !enPassantColor)
                 {
                     moves[Position.x - 1, Position.y + 1] = true;
                 }
@@ -31,7 +32,7 @@ public class Pawn : Piece
             // right
             if (Position.x != 7 && Position.y != 7)
             {
-                if (enPassant[0] == Position.x + 1 && enPassant[1] == Position.y + 1)
+                if (enPassant[0] == Position.x + 1 && enPassant[1] == Position.y + 1 && !enPassantColor)
                 {
                     moves[Position.x + 1, Position.y + 1] = true;
                 }
@@ -70,7 +71,7 @@ public class Pawn : Piece
             // right
             if (Position.x != 0 && Position.y != 0)
             {
-                if (enPassant[0] == Position.x + 1 && enPassant[1] == Position.y - 1)
+                if (enPassant[0] == Position.x + 1 && enPassant[1] == Position.y - 1 && enPassantColor)
                 {
                     moves[Position.x + 1, Position.y + 1] = true;
                 }
@@ -86,7 +87,7 @@ public class Pawn : Piece
             // left
             if (Position.x != 7 && Position.y != 0)
             {
-                if (enPassant[0] == Position.x - 1 && enPassant[1] == Position.y - 1)
+                if (enPassant[0] == Position.x - 1 && enPassant[1] == Position.y - 1 && enPassantColor)
                 {
                     moves[Position.x - 1, Position.y - 1] = true;
                 }
