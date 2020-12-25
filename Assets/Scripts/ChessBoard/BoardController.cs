@@ -59,7 +59,7 @@ public class BoardController : MonoBehaviour
         CreateMoveHighligts();
     }
 
-    void Update()
+    void Update() // <---
     {
         if (_GameIsPaused)
             return;
@@ -114,7 +114,7 @@ public class BoardController : MonoBehaviour
 
         return false;
     }
-    void SelectPiece(int x, int y)
+    void SelectPiece(int x, int y) // <---
     {
         if (chessboard[x, y] == null)
             return;
@@ -136,7 +136,7 @@ public class BoardController : MonoBehaviour
         EnableMoveHighligts();
     }
 
-    void MovePiece(int x, int y)
+    void MovePiece(int x, int y) // <---
     {
         if (_allowedMoves[x, y])
         {
@@ -228,7 +228,7 @@ public class BoardController : MonoBehaviour
         _selectedPiece = null;
     }
 
-    private void Castling()
+    private void Castling() // <---
     {
         if (_isWhiteTurn)
         {
@@ -270,7 +270,7 @@ public class BoardController : MonoBehaviour
         }
     }
 
-    private void SpacesUnderAttack()
+    private void SpacesUnderAttack() // <---
     {
         _spacesUnderAttack = new bool[8, 8];
 
@@ -297,7 +297,7 @@ public class BoardController : MonoBehaviour
         }
     }
 
-    private void CheckKing()
+    private void CheckKing() // <---
     {
         SpacesUnderAttack();
 
@@ -336,7 +336,7 @@ public class BoardController : MonoBehaviour
         }
     }
 
-    void ChangePawn(int pieceNumber)
+    void ChangePawn(int pieceNumber) // <---
     {
         _GameIsPaused = false;
 
@@ -368,6 +368,8 @@ public class BoardController : MonoBehaviour
 
         DisableMoveHighligts();
         _selectedPiece = null; // обнуляю выбранную фигуру
+
+        CheckKing();
     }
 
     void SpawnPiece(int index, int x, int y)

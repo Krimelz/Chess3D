@@ -71,6 +71,7 @@ public class GameMenuController : MonoBehaviour
 
     public void RestartGame()
     {
+        _winText.text = "GAME MENU";
         _gameMenu.SetActive(false);
         restartGame?.Invoke();
     }
