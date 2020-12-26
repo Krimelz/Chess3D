@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-// TODO: Вынести в функцию и исправить взятие на проходе: Находится ли король под боем
+// TODO: Мат
 
 public class BoardController : MonoBehaviour
 {
@@ -11,37 +11,37 @@ public class BoardController : MonoBehaviour
     public delegate void DelBool(bool turn);
     public delegate void DelVoid();
 
-    public event DelBool        win;
-    public event DelVoid        changePawn;
+    public event DelBool win;
+    public event DelVoid changePawn;
 
     [SerializeField]
-    private GameObject          _highlihgt;
+    private GameObject _highlihgt;
     [SerializeField]
-    private List<GameObject>    _piecesPrefabs;
+    private List<GameObject> _piecesPrefabs;
 
-    public int[]                EnPassant { get; set; }
-    public bool                 EnPassantColor { get; set; }
+    public int[] EnPassant { get; set; }
+    public bool EnPassantColor { get; set; }
     [SerializeField]
-    private GameObject          _moveHighlightPrefab;
-    private GameObject[,]       _moveHighlights;
-    private bool[,]             _allowedMoves { get; set; }
-    private bool[,]             _spacesUnderAttack { get; set; }
+    private GameObject _moveHighlightPrefab;
+    private GameObject[,] _moveHighlights;
+    private bool[,] _allowedMoves { get; set; }
+    private bool[,] _allSpacesUnderAttack { get; set; }
 
-    private Camera              _camera;
-    private Ray                 _ray;
-    private RaycastHit          _hit = new RaycastHit();
+    private Camera _camera;
+    private Ray _ray;
+    private RaycastHit _hit = new RaycastHit();
 
-    public Piece[,]             chessboard;
+    public Piece[,] chessboard;
     [SerializeField]
-    private Vector2Int          _selection;
-    private Piece               _selectedPiece;
-    private List<GameObject>    _pieces;
-    private bool                _isWhiteTurn = true;
-    private bool                _GameIsPaused = false;
+    private Vector2Int _selection;
+    private Piece _selectedPiece;
+    private List<GameObject> _pieces;
+    private bool _isWhiteTurn = true;
+    private bool _GameIsPaused = false;
 
-    private Piece               _whiteKing;
-    private Piece               _blackKing;
-    private bool                _kingIsAttacked = false;
+    private Piece _whiteKing;
+    private Piece _blackKing;
+    private bool _kingIsAttacked = false;
 
     private void Awake()
     {
@@ -60,7 +60,7 @@ public class BoardController : MonoBehaviour
         CreateMoveHighligts();
     }
 
-    void Update() // <---
+    void Update()
     {
         if (_GameIsPaused)
             return;
@@ -79,6 +79,7 @@ public class BoardController : MonoBehaviour
                 {
                     MovePiece(_selection.x, _selection.y);
                     CheckKing();
+                    isCheckmate();
                 }
             }
         }
@@ -115,7 +116,54 @@ public class BoardController : MonoBehaviour
 
         return false;
     }
-    void SelectPiece(int x, int y) 
+
+    private void isCheckmate()
+    {
+        bool hasMoves = false;
+
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                Piece p = chessboard[i, j];
+
+                if (p != null && p.isWhite == _isWhiteTurn)
+                {
+                    if (_kingIsAttacked)
+                    {
+                        if (p.GetType() == typeof(King))
+                        {
+                            _allowedMoves = p.PossibleMove();
+                            KingMoves();
+                        }
+                        else
+                        {
+                            _allowedMoves = p.PossibleMove();
+                            PieceMoves(p);
+                        }
+                    }
+                    else
+                    {
+                        if (p.GetType() == typeof(King))
+                        {
+                            _allowedMoves = p.PossibleMove();
+                            KingMoves();
+                        }
+                        else
+                        {
+                            _allowedMoves = p.PossibleMove();
+                        }
+                    }
+
+                    hasMoves |= HasMoves();
+                }
+            }
+        }
+
+        if (!hasMoves)
+            EndGame();
+    }
+    void SelectPiece(int x, int y)
     {
         if (chessboard[x, y] == null)
             return;
@@ -123,12 +171,32 @@ public class BoardController : MonoBehaviour
         if (chessboard[x, y].isWhite != _isWhiteTurn)
             return;
 
-        _allowedMoves = chessboard[x, y].PossibleMove();
         _selectedPiece = chessboard[x, y];
-
-        if (_selectedPiece.GetType() == typeof(King))
+        
+        if (_kingIsAttacked)
         {
-            KingMoves();
+            if (_selectedPiece.GetType() == typeof(King))
+            {
+                _allowedMoves = _selectedPiece.PossibleMove();
+                KingMoves();
+            }
+            else
+            {
+                _allowedMoves = _selectedPiece.PossibleMove();
+                PieceMoves(_selectedPiece);
+            }   
+        }
+        else
+        {
+            if (_selectedPiece.GetType() == typeof(King))
+            {
+                _allowedMoves = _selectedPiece.PossibleMove();
+                KingMoves();
+            }
+            else
+            {
+                _allowedMoves = _selectedPiece.PossibleMove();
+            }
         }
 
         if (!HasMoves())
@@ -140,7 +208,7 @@ public class BoardController : MonoBehaviour
         EnableMoveHighligts();
     }
 
-    void MovePiece(int x, int y) // <---
+    void MovePiece(int x, int y)
     {
         if (_allowedMoves[x, y])
         {
@@ -158,7 +226,7 @@ public class BoardController : MonoBehaviour
                 p = null;
             }
 
-            // TODO: Вынести в функцию и исправить взятие на проходе
+            // TODO: Вынести в функцию
             if (_selectedPiece.GetType() == typeof(Pawn))
             {
                 if (p == null && y == 7 || y == 0)
@@ -179,7 +247,7 @@ public class BoardController : MonoBehaviour
                         p = chessboard[x, y + 1];
                     }
 
-                    _pieces.Remove(p.gameObject); // <--------------
+                    _pieces.Remove(p.gameObject);
                     Destroy(p.gameObject);
                 }
 
@@ -234,7 +302,7 @@ public class BoardController : MonoBehaviour
         _selectedPiece = null;
     }
 
-    private void Castling() // <---
+    private void Castling()
     {
         if (_isWhiteTurn)
         {
@@ -276,9 +344,9 @@ public class BoardController : MonoBehaviour
         }
     }
 
-    private void SpacesUnderAttack() // <---
+    private void AllSpacesUnderAttack()
     {
-        _spacesUnderAttack = new bool[8, 8];
+        _allSpacesUnderAttack = new bool[8, 8];
 
         for (int x = 0; x < 8; x++)
         {
@@ -294,10 +362,7 @@ public class BoardController : MonoBehaviour
                     {
                         for (int j = 0; j < 8; j++)
                         {
-                            _spacesUnderAttack[i, j] |= attackedSpaces[i, j];
-
-                            //if (attackedSpaces[i, j])
-                            //    _spacesUnderAttack[i, j] = true;
+                            _allSpacesUnderAttack[i, j] |= attackedSpaces[i, j];
                         }
                     }
                 }
@@ -305,40 +370,94 @@ public class BoardController : MonoBehaviour
         }
     }
 
-    private void CheckKing() // <---
+    private void CheckKing()
     {
-        SpacesUnderAttack();
+        AllSpacesUnderAttack();
 
         if (_isWhiteTurn)
         {
-            if (_spacesUnderAttack[_whiteKing.Position.x, _whiteKing.Position.y])
+            if (_allSpacesUnderAttack[_whiteKing.Position.x, _whiteKing.Position.y])
             {
                 _kingIsAttacked = true;
-                //SelectPiece(_whiteKing.Position.x, _whiteKing.Position.y);
+            }
+            else
+            {
+                _kingIsAttacked = false;
             }
         }
         else
         {
-            if (_spacesUnderAttack[_blackKing.Position.x, _blackKing.Position.y])
+            if (_allSpacesUnderAttack[_blackKing.Position.x, _blackKing.Position.y])
             {
                 _kingIsAttacked = true;
-                //SelectPiece(_blackKing.Position.x, _blackKing.Position.y);
+            }
+            else
+            {
+                _kingIsAttacked = false;
             }
         }  
     }
 
-    private void KingMoves() // <-----
+    private void KingMoves()
     {
-        for (int i = _selectedPiece.Position.x - 1; i <= _selectedPiece.Position.x + 1; i++)
+        Piece p;
+
+        if (_isWhiteTurn)
         {
-            for (int j = _selectedPiece.Position.y - 1; j <= _selectedPiece.Position.y + 1; j++)
+            p = _whiteKing;
+        }
+        else
+        {
+            p = _blackKing;
+        }
+
+        for (int i = p.Position.x - 1; i <= p.Position.x + 1; i++)
+        {
+            for (int j = p.Position.y - 1; j <= p.Position.y + 1; j++)
             {
                 if (i >= 0 && i < 8 && j >= 0 && j < 8)
                 {
-                    if (_spacesUnderAttack[i, j])
+                    if (_allSpacesUnderAttack[i, j])
                     {
                         _allowedMoves[i, j] = false;
                     }
+                }
+            }
+        }
+    }
+
+    private void PieceMoves(Piece piece)
+    {
+        bool[,] pm = piece.PossibleMove();
+        Piece tmp;
+
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                if (pm[i, j])
+                {
+                    tmp = null;
+                    if (chessboard[i, j] != null)
+                    {
+                        tmp = chessboard[i, j];
+                    }
+
+                    chessboard[i, j] = piece;
+                    chessboard[piece.Position.x, piece.Position.y] = null;
+                    CheckKing();
+
+                    if (_kingIsAttacked)
+                    {
+                        _allowedMoves[i, j] = false;
+                    }
+                    else
+                    {
+                        _allowedMoves[i, j] = true;
+                    }
+
+                    chessboard[i, j] = tmp;
+                    chessboard[piece.Position.x, piece.Position.y] = piece;
                 }
             }
         }
