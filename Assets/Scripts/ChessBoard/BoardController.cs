@@ -173,31 +173,18 @@ public class BoardController : MonoBehaviour
 
         _selectedPiece = chessboard[x, y];
         
-        if (_kingIsAttacked)
+
+        if (_selectedPiece.GetType() == typeof(King))
         {
-            if (_selectedPiece.GetType() == typeof(King))
-            {
-                _allowedMoves = _selectedPiece.PossibleMove();
-                KingMoves();
-            }
-            else
-            {
-                _allowedMoves = _selectedPiece.PossibleMove();
-                PieceMoves(_selectedPiece);
-            }   
+            _allowedMoves = _selectedPiece.PossibleMove();
+            KingMoves();
         }
         else
         {
-            if (_selectedPiece.GetType() == typeof(King))
-            {
-                _allowedMoves = _selectedPiece.PossibleMove();
-                KingMoves();
-            }
-            else
-            {
-                _allowedMoves = _selectedPiece.PossibleMove();
-            }
-        }
+            _allowedMoves = _selectedPiece.PossibleMove();
+            PieceMoves(_selectedPiece);
+        }   
+
 
         if (!HasMoves())
         {
@@ -410,6 +397,8 @@ public class BoardController : MonoBehaviour
         {
             p = _blackKing;
         }
+
+        AllSpacesUnderAttack();
 
         for (int i = p.Position.x - 2; i <= p.Position.x + 2; i++)
         {
