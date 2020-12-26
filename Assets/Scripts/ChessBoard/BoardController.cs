@@ -642,6 +642,6 @@ public class BoardController : MonoBehaviour
     {
         DisableMoveHighligts();
         Pause(true);
-        win?.Invoke(_isWhiteTurn);
+        win?.Invoke(!_isWhiteTurn);
     }
 }
