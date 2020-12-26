@@ -304,7 +304,7 @@ public class BoardController : MonoBehaviour
 
     private void Castling()
     {
-        if (_isWhiteTurn)
+        if (_isWhiteTurn && !_kingIsAttacked)
         {
             if (_selection.x == 6)
             {
@@ -411,7 +411,7 @@ public class BoardController : MonoBehaviour
             p = _blackKing;
         }
 
-        for (int i = p.Position.x - 1; i <= p.Position.x + 1; i++)
+        for (int i = p.Position.x - 2; i <= p.Position.x + 2; i++)
         {
             for (int j = p.Position.y - 1; j <= p.Position.y + 1; j++)
             {
