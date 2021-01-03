@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Queen : Piece
 {
-    public override bool[,] PossibleMove()
+    public override bool[,] PossibleMove(in Piece[,] chessboard)
     {
         bool[,] moves = new bool[8, 8];
         Piece p;
@@ -13,7 +13,7 @@ public class Queen : Piece
         // right
         for (i = Position.y + 1; i < 8; i++)
         {
-            p = BoardController.Instance.chessboard[Position.x, i];
+            p = chessboard[Position.x, i];
 
             if (p == null)
             {
@@ -33,7 +33,7 @@ public class Queen : Piece
         // left
         for (i = Position.y - 1; i >= 0; i--)
         {
-            p = BoardController.Instance.chessboard[Position.x, i];
+            p = chessboard[Position.x, i];
 
             if (p == null)
             {
@@ -53,7 +53,7 @@ public class Queen : Piece
         // up
         for (i = Position.x - 1; i >= 0; i--)
         {
-            p = BoardController.Instance.chessboard[i, Position.y];
+            p = chessboard[i, Position.y];
 
             if (p == null)
             {
@@ -73,7 +73,7 @@ public class Queen : Piece
         // down
         for (i = Position.x + 1; i < 8; i++)
         {
-            p = BoardController.Instance.chessboard[i, Position.y];
+            p = chessboard[i, Position.y];
 
             if (p == null)
             {
@@ -102,7 +102,7 @@ public class Queen : Piece
             if (i < 0 || j < 0)
                 break;
 
-            p = BoardController.Instance.chessboard[i, j];
+            p = chessboard[i, j];
 
             if (p == null)
             {
@@ -131,7 +131,7 @@ public class Queen : Piece
             if (i > 7 || j > 7)
                 break;
 
-            p = BoardController.Instance.chessboard[i, j];
+            p = chessboard[i, j];
 
             if (p == null)
             {
@@ -160,7 +160,7 @@ public class Queen : Piece
             if (i > 7 || j < 0)
                 break;
 
-            p = BoardController.Instance.chessboard[i, j];
+            p = chessboard[i, j];
 
             if (p == null)
             {
@@ -189,7 +189,7 @@ public class Queen : Piece
             if (i < 0 || j > 7)
                 break;
 
-            p = BoardController.Instance.chessboard[i, j];
+            p = chessboard[i, j];
 
             if (p == null)
             {
@@ -211,7 +211,7 @@ public class Queen : Piece
         return moves;
     }
 
-    public override bool[,] AttackedSpaces()
+    public override bool[,] AttackedSpaces(in Piece[,] chessboard)
     {
         bool[,] attackedSpaces = new bool[8, 8];
 
@@ -221,7 +221,7 @@ public class Queen : Piece
         // right
         for (i = Position.y + 1; i < 8; i++)
         {
-            p = BoardController.Instance.chessboard[Position.x, i];
+            p = chessboard[Position.x, i];
 
             if (p == null || p.GetType() == typeof(King))
             {
@@ -237,7 +237,7 @@ public class Queen : Piece
         // left
         for (i = Position.y - 1; i >= 0; i--)
         {
-            p = BoardController.Instance.chessboard[Position.x, i];
+            p = chessboard[Position.x, i];
 
             if (p == null || p.GetType() == typeof(King))
             {
@@ -253,7 +253,7 @@ public class Queen : Piece
         // up
         for (i = Position.x - 1; i >= 0; i--)
         {
-            p = BoardController.Instance.chessboard[i, Position.y];
+            p = chessboard[i, Position.y];
 
             if (p == null || p.GetType() == typeof(King))
             {
@@ -269,7 +269,7 @@ public class Queen : Piece
         // down
         for (i = Position.x + 1; i < 8; i++)
         {
-            p = BoardController.Instance.chessboard[i, Position.y];
+            p = chessboard[i, Position.y];
 
             if (p == null || p.GetType() == typeof(King))
             {
@@ -294,7 +294,7 @@ public class Queen : Piece
             if (i < 0 || j < 0)
                 break;
 
-            p = BoardController.Instance.chessboard[i, j];
+            p = chessboard[i, j];
 
             if (p == null || p.GetType() == typeof(King))
             {
@@ -319,7 +319,7 @@ public class Queen : Piece
             if (i > 7 || j > 7)
                 break;
 
-            p = BoardController.Instance.chessboard[i, j];
+            p = chessboard[i, j];
 
             if (p == null || p.GetType() == typeof(King))
             {
@@ -344,7 +344,7 @@ public class Queen : Piece
             if (i > 7 || j < 0)
                 break;
 
-            p = BoardController.Instance.chessboard[i, j];
+            p = chessboard[i, j];
 
             if (p == null || p.GetType() == typeof(King))
             {
@@ -369,7 +369,7 @@ public class Queen : Piece
             if (i < 0 || j > 7)
                 break;
 
-            p = BoardController.Instance.chessboard[i, j];
+            p = chessboard[i, j];
 
             if (p == null || p.GetType() == typeof(King))
             {

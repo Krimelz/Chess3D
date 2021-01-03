@@ -6,7 +6,6 @@ using UnityEngine.UI;
 
 public class GameMenuController : MonoBehaviour
 {
-    public static GameMenuController Instance { get; set; }
     [SerializeField]
     private GameObject              _gameMenu;
     [SerializeField]
@@ -14,24 +13,12 @@ public class GameMenuController : MonoBehaviour
     [SerializeField]
     private Text                    _winText;
 
-    public delegate void DelVoid();
-    public delegate void DelBool(bool isPaused);
-    public delegate void DelInt(int pieceNumber);
-    public event DelVoid restartGame;
-    public event DelBool gamePause;
-    public event DelInt changePawn;
-
     private bool _pause = false;
-
-    private void Awake()
-    {
-        Instance = this;
-    }
 
     void Start()
     {
-        BoardController.Instance.win += PrintWinner;
-        BoardController.Instance.changePawn += EnableChangePawn;
+        EventManager<bool>.AddEvent("PrintWinner", PrintWinner);
+        EventManager.AddEvent("EnableChangePawn", EnableChangePawn);
     }
 
     private void Update()
@@ -40,7 +27,7 @@ public class GameMenuController : MonoBehaviour
         {
             _pause = !_pause;
             _gameMenu.SetActive(_pause);
-            gamePause.Invoke(_pause);
+            EventManager<bool>.Broadcast("Pause", _pause);
         }
     }
 
@@ -49,17 +36,32 @@ public class GameMenuController : MonoBehaviour
         _newPieces.SetActive(true);
     }
 
-    public void GetNewPieceNumber(int pieceNumber)
+    public void DisableChangePawn()
     {
-        changePawn?.Invoke(pieceNumber);
         _newPieces.SetActive(false);
     }
 
-    public void PrintWinner(bool turn)
+    public void EnableGameMenu()
     {
         _gameMenu.SetActive(true);
+    }
 
-        if (turn)
+    public void DisableGameMenu()
+    {
+        _gameMenu.SetActive(false);
+    }
+
+    public void GetNewPieceNumber(int pieceNumber)
+    {
+        EventManager<int>.Broadcast("ChangePawn", pieceNumber);
+        DisableChangePawn();
+    }
+
+    public void PrintWinner(bool isWhiteTurn)
+    {
+        EnableGameMenu();
+
+        if (isWhiteTurn)
         {
             _winText.text = "WHITE WINS";
         }
@@ -72,8 +74,8 @@ public class GameMenuController : MonoBehaviour
     public void RestartGame()
     {
         _winText.text = "GAME MENU";
-        _gameMenu.SetActive(false);
-        restartGame?.Invoke();
+        DisableGameMenu();
+        EventManager.Broadcast("RestartGame");
     }
 
     public void ExitToMenu()

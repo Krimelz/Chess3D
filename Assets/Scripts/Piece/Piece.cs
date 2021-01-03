@@ -6,12 +6,12 @@ public abstract class Piece : MonoBehaviour
     public bool isWhite;
     public bool wasWalking = false;
 
-    public virtual bool[,] PossibleMove()
+    public virtual bool[,] PossibleMove(in Piece[,] chessboard)
     {
         return new bool[8, 8];
     }
 
-    public virtual bool[,] AttackedSpaces()
+    public virtual bool[,] AttackedSpaces(in Piece[,] chessboard)
     {
         return new bool[8, 8];
     }

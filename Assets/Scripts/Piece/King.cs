@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class King : Piece
 {
-    public override bool[,] PossibleMove()
+    public override bool[,] PossibleMove(in Piece[,] chessboard)
     {
         bool[,] moves = new bool[8, 8];
         Piece p;
@@ -15,7 +15,7 @@ public class King : Piece
             {
                 if (Position.x + i >= 0 && Position.x + i <= 7 && Position.y + j >= 0 && Position.y + j <= 7)
                 {
-                    p = BoardController.Instance.chessboard[Position.x + i, Position.y + j];
+                    p = chessboard[Position.x + i, Position.y + j];
 
                     if (p == null)
                     {
@@ -37,7 +37,7 @@ public class King : Piece
                 bool empty = true;
                 for (int i = Position.x + 1; i <= 6; i++)
                 {
-                    p = BoardController.Instance.chessboard[i, 0];
+                    p = chessboard[i, 0];
 
                     if (p != null)
                     {
@@ -46,7 +46,7 @@ public class King : Piece
                     }
                 }
 
-                p = BoardController.Instance.chessboard[7, 0];
+                p = chessboard[7, 0];
 
                 if (p != null && p.GetType() == typeof(Rook) && !p.wasWalking && empty)
                 {
@@ -58,7 +58,7 @@ public class King : Piece
                 // Длинная рокировка
                 for (int i = Position.x - 1; i >= 1; i--)
                 {
-                    p = BoardController.Instance.chessboard[i, 0];
+                    p = chessboard[i, 0];
 
                     if (p != null)
                     {
@@ -67,7 +67,7 @@ public class King : Piece
                     }
                 }
 
-                p = BoardController.Instance.chessboard[0, 0];
+                p = chessboard[0, 0];
 
                 if (p != null && p.GetType() == typeof(Rook) && !p.wasWalking && empty)
                 {
@@ -83,7 +83,7 @@ public class King : Piece
                 bool empty = true;
                 for (int i = Position.x + 1; i <= 6; i++)
                 {
-                    p = BoardController.Instance.chessboard[i, 7];
+                    p = chessboard[i, 7];
 
                     if (p != null)
                     {
@@ -92,7 +92,7 @@ public class King : Piece
                     }
                 }
 
-                p = BoardController.Instance.chessboard[7, 7];
+                p = chessboard[7, 7];
 
                 if (p != null && p.GetType() == typeof(Rook) && !p.wasWalking && empty)
                 {
@@ -104,7 +104,7 @@ public class King : Piece
                 // Длинная рокировка
                 for (int i = Position.x - 1; i >= 1; i--)
                 {
-                    p = BoardController.Instance.chessboard[i, 7];
+                    p = chessboard[i, 7];
 
                     if (p != null)
                     {
@@ -113,7 +113,7 @@ public class King : Piece
                     }
                 }
 
-                p = BoardController.Instance.chessboard[0, 7];
+                p = chessboard[0, 7];
 
                 if (p != null && p.GetType() == typeof(Rook) && !p.wasWalking && empty)
                 {
@@ -128,7 +128,7 @@ public class King : Piece
         return moves;
     }
 
-    public override bool[,] AttackedSpaces()
+    public override bool[,] AttackedSpaces(in Piece[,] chessboard)
     {
         bool[,] attackedSpaces = new bool[8, 8];
 

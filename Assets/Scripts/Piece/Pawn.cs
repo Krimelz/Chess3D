@@ -4,11 +4,11 @@ using UnityEngine;
 
 public class Pawn : Piece
 {
-    public override bool[,] PossibleMove()
+    public override bool[,] PossibleMove(in Piece[,] chessboard)
     {
         bool[,] moves = new bool[8, 8];
-        int[] enPassant = BoardController.Instance.EnPassant;
-        bool enPassantColor = BoardController.Instance.EnPassantColor;
+        int[] enPassant = BoardController.EnPassant;
+        bool enPassantColor = BoardController.EnPassantColor;
         Piece p1, p2;
 
         if (isWhite)
@@ -21,7 +21,7 @@ public class Pawn : Piece
                     moves[Position.x - 1, Position.y + 1] = true;
                 }
 
-                p1 = BoardController.Instance.chessboard[Position.x - 1, Position.y + 1];
+                p1 = chessboard[Position.x - 1, Position.y + 1];
 
                 if (p1 != null && !p1.isWhite)
                 {
@@ -37,7 +37,7 @@ public class Pawn : Piece
                     moves[Position.x + 1, Position.y + 1] = true;
                 }
 
-                p1 = BoardController.Instance.chessboard[Position.x + 1, Position.y + 1];
+                p1 = chessboard[Position.x + 1, Position.y + 1];
 
                 if (p1 != null && !p1.isWhite)
                 {
@@ -47,8 +47,8 @@ public class Pawn : Piece
 
             if (Position.y == 1)
             {
-                p1 = BoardController.Instance.chessboard[Position.x, Position.y + 1];
-                p2 = BoardController.Instance.chessboard[Position.x, Position.y + 2];
+                p1 = chessboard[Position.x, Position.y + 1];
+                p2 = chessboard[Position.x, Position.y + 2];
 
                 if (p1 == null && p2 == null)
                 {
@@ -58,7 +58,7 @@ public class Pawn : Piece
 
             if (Position.y != 7)
             {
-                p1 = BoardController.Instance.chessboard[Position.x, Position.y + 1];
+                p1 = chessboard[Position.x, Position.y + 1];
 
                 if (p1 == null)
                 {
@@ -76,7 +76,7 @@ public class Pawn : Piece
                     moves[Position.x + 1, Position.y + 1] = true;
                 }
 
-                p1 = BoardController.Instance.chessboard[Position.x - 1, Position.y - 1];
+                p1 = chessboard[Position.x - 1, Position.y - 1];
 
                 if (p1 != null && p1.isWhite)
                 {
@@ -92,7 +92,7 @@ public class Pawn : Piece
                     moves[Position.x - 1, Position.y - 1] = true;
                 }
 
-                p1 = BoardController.Instance.chessboard[Position.x + 1, Position.y - 1];
+                p1 = chessboard[Position.x + 1, Position.y - 1];
 
                 if (p1 != null && p1.isWhite)
                 {
@@ -102,8 +102,8 @@ public class Pawn : Piece
 
             if (Position.y == 6)
             {
-                p1 = BoardController.Instance.chessboard[Position.x, Position.y - 1];
-                p2 = BoardController.Instance.chessboard[Position.x, Position.y - 2];
+                p1 = chessboard[Position.x, Position.y - 1];
+                p2 = chessboard[Position.x, Position.y - 2];
 
                 if (p1 == null && p2 == null)
                 {
@@ -113,7 +113,7 @@ public class Pawn : Piece
 
             if (Position.y != 0)
             {
-                p1 = BoardController.Instance.chessboard[Position.x, Position.y - 1];
+                p1 = chessboard[Position.x, Position.y - 1];
 
                 if (p1 == null)
                 {
@@ -125,7 +125,7 @@ public class Pawn : Piece
         return moves;
     }
 
-    public override bool[,] AttackedSpaces()
+    public override bool[,] AttackedSpaces(in Piece[,] chessboard)
     {
         bool[,] attackedSpaces = new bool[8, 8];
 

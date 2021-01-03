@@ -2,74 +2,54 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-// TODO: Мат
-
 public class BoardController : MonoBehaviour
 {
-    public static BoardController Instance { get; set; }
-
-    public delegate void DelBool(bool turn);
-    public delegate void DelVoid();
-
-    public event DelBool win;
-    public event DelVoid changePawn;
-
-    [SerializeField]
-    private GameObject _highlihgt;
     [SerializeField]
     private List<GameObject> _piecesPrefabs;
 
-    public int[] EnPassant { get; set; }
-    public bool EnPassantColor { get; set; }
-    [SerializeField]
-    private GameObject _moveHighlightPrefab;
-    private GameObject[,] _moveHighlights;
+    public static int[] EnPassant { get; private set; } // <--
+    public static bool EnPassantColor { get; private set; } // <--
     private bool[,] _allowedMoves { get; set; }
     private bool[,] _allSpacesUnderAttack { get; set; }
 
     private Camera _camera;
     private Ray _ray;
     private RaycastHit _hit = new RaycastHit();
-
-    public Piece[,] chessboard;
-    [SerializeField]
+    private bool _isHit;
     private Vector2Int _selection;
+
+    private Piece[,] _chessboard;
     private Piece _selectedPiece;
     private List<GameObject> _pieces;
     private bool _isWhiteTurn = true;
-    private bool _GameIsPaused = false;
+    private bool _gameIsPaused = false;
 
     private Piece _whiteKing;
     private Piece _blackKing;
     private bool _kingIsAttacked = false;
 
-    private void Awake()
-    {
-        Instance = this;
-    }
-
     void Start()
     {
         _camera = Camera.main;
 
-        GameMenuController.Instance.restartGame += RestartGame;
-        GameMenuController.Instance.changePawn += ChangePawn;
-        GameMenuController.Instance.gamePause += Pause;
-
         SpawnAllPieces();
-        CreateMoveHighligts();
+
+        EventManager.AddEvent("RestartGame", RestartGame);
+        EventManager<int>.AddEvent("ChangePawn", ChangePawn);
+        EventManager<bool>.AddEvent("Pause", Pause);
+
     }
 
     void Update()
     {
-        if (_GameIsPaused)
+        if (_gameIsPaused)
             return;
 
         UpdateSelection();
 
         if (Input.GetMouseButtonDown(0))
         {
-            if (_highlihgt.activeSelf)
+            if (_isHit)
             {
                 if (_selectedPiece == null)
                 {
@@ -89,16 +69,12 @@ public class BoardController : MonoBehaviour
     {
         _ray = _camera.ScreenPointToRay(Input.mousePosition);
 
-        if (Physics.Raycast(_ray, out _hit))
+        if (_isHit = Physics.Raycast(_ray, out _hit))
         {
-            _highlihgt.SetActive(true);
             _selection = new Vector2Int(Mathf.RoundToInt(_hit.point.x), Mathf.RoundToInt(_hit.point.z));
-            _highlihgt.transform.position = new Vector3(_selection.x, 0.015f, _selection.y);
         }
-        else
-        {
-            _highlihgt.SetActive(false);
-        }
+
+        EventManager<Vector2Int, bool>.Broadcast("UpdateSelectionHighlight", _selection, _isHit);
     }
 
     bool HasMoves()
@@ -125,7 +101,7 @@ public class BoardController : MonoBehaviour
         {
             for (int j = 0; j < 8; j++)
             {
-                Piece p = chessboard[i, j];
+                Piece p = _chessboard[i, j];
 
                 if (p != null && p.isWhite == _isWhiteTurn)
                 {
@@ -133,12 +109,12 @@ public class BoardController : MonoBehaviour
                     {
                         if (p.GetType() == typeof(King))
                         {
-                            _allowedMoves = p.PossibleMove();
+                            _allowedMoves = p.PossibleMove(in _chessboard);
                             KingMoves();
                         }
                         else
                         {
-                            _allowedMoves = p.PossibleMove();
+                            _allowedMoves = p.PossibleMove(in _chessboard);
                             PieceMoves(p);
                         }
                     }
@@ -146,12 +122,12 @@ public class BoardController : MonoBehaviour
                     {
                         if (p.GetType() == typeof(King))
                         {
-                            _allowedMoves = p.PossibleMove();
+                            _allowedMoves = p.PossibleMove(in _chessboard);
                             KingMoves();
                         }
                         else
                         {
-                            _allowedMoves = p.PossibleMove();
+                            _allowedMoves = p.PossibleMove(in _chessboard);
                         }
                     }
 
@@ -165,23 +141,23 @@ public class BoardController : MonoBehaviour
     }
     void SelectPiece(int x, int y)
     {
-        if (chessboard[x, y] == null)
+        if (_chessboard[x, y] == null)
             return;
 
-        if (chessboard[x, y].isWhite != _isWhiteTurn)
+        if (_chessboard[x, y].isWhite != _isWhiteTurn)
             return;
 
-        _selectedPiece = chessboard[x, y];
+        _selectedPiece = _chessboard[x, y];
         
 
         if (_selectedPiece.GetType() == typeof(King))
         {
-            _allowedMoves = _selectedPiece.PossibleMove();
+            _allowedMoves = _selectedPiece.PossibleMove(in _chessboard);
             KingMoves();
         }
         else
         {
-            _allowedMoves = _selectedPiece.PossibleMove();
+            _allowedMoves = _selectedPiece.PossibleMove(in _chessboard);
             PieceMoves(_selectedPiece);
         }   
 
@@ -192,22 +168,17 @@ public class BoardController : MonoBehaviour
             return;
         }
 
-        EnableMoveHighligts();
+        EventManager<bool[,]>.Broadcast("EnableMoveHighligts", _allowedMoves);
     }
 
     void MovePiece(int x, int y)
     {
         if (_allowedMoves[x, y])
         {
-            Piece p = chessboard[x, y];
+            Piece p = _chessboard[x, y];
 
             if (p != null && p.isWhite != _isWhiteTurn)
             {
-                if (p.GetType() == typeof(King))
-                {
-                    EndGame();
-                }
-
                 _pieces.Remove(p.gameObject);
                 Destroy(p.gameObject);
                 p = null;
@@ -218,7 +189,7 @@ public class BoardController : MonoBehaviour
             {
                 if (p == null && y == 7 || y == 0)
                 {
-                    changePawn?.Invoke();
+                    EventManager.Broadcast("EnableChangePawn");
                     Pause(true);
                     return;
                 }
@@ -227,11 +198,11 @@ public class BoardController : MonoBehaviour
                 {
                     if (_isWhiteTurn)
                     {
-                        p = chessboard[x, y - 1];
+                        p = _chessboard[x, y - 1];
                     }
                     else
                     {
-                        p = chessboard[x, y + 1];
+                        p = _chessboard[x, y + 1];
                     }
 
                     _pieces.Remove(p.gameObject);
@@ -254,7 +225,7 @@ public class BoardController : MonoBehaviour
                 }
             }
 
-            chessboard[_selectedPiece.Position.x, _selectedPiece.Position.y] = null;
+            _chessboard[_selectedPiece.Position.x, _selectedPiece.Position.y] = null;
             _selectedPiece.transform.position = CalcSpaceCoords(x, y);
             _selectedPiece.Position = new Vector2Int(x, y);
 
@@ -277,15 +248,12 @@ public class BoardController : MonoBehaviour
             }
 
             _selectedPiece.wasWalking = true;
-            chessboard[x, y] = _selectedPiece;
+            _chessboard[x, y] = _selectedPiece;
             _isWhiteTurn = !_isWhiteTurn;
             _kingIsAttacked = false;
         }
 
-        //if (_kingIsAttacked)
-        //    return;    
-
-        DisableMoveHighligts();
+        EventManager.Broadcast("DisableMoveHighligts");
         _selectedPiece = null;
     }
 
@@ -295,38 +263,38 @@ public class BoardController : MonoBehaviour
         {
             if (_selection.x == 6)
             {
-                chessboard[5, 0] = chessboard[7, 0];
-                chessboard[5, 0].Position = new Vector2Int(5, 0);
-                chessboard[5, 0].wasWalking = true;
-                chessboard[5, 0].transform.position = CalcSpaceCoords(5, 0);
-                chessboard[7, 0] = null;
+                _chessboard[5, 0] = _chessboard[7, 0];
+                _chessboard[5, 0].Position = new Vector2Int(5, 0);
+                _chessboard[5, 0].wasWalking = true;
+                _chessboard[5, 0].transform.position = CalcSpaceCoords(5, 0);
+                _chessboard[7, 0] = null;
             }
             else if (_selection.x == 2)
             {
-                chessboard[3, 0] = chessboard[0, 0];
-                chessboard[3, 0].Position = new Vector2Int(3, 0);
-                chessboard[3, 0].wasWalking = true;
-                chessboard[3, 0].transform.position = CalcSpaceCoords(3, 0);
-                chessboard[0, 0] = null;
+                _chessboard[3, 0] = _chessboard[0, 0];
+                _chessboard[3, 0].Position = new Vector2Int(3, 0);
+                _chessboard[3, 0].wasWalking = true;
+                _chessboard[3, 0].transform.position = CalcSpaceCoords(3, 0);
+                _chessboard[0, 0] = null;
             }
         }
         else
         {
             if (_selection.x == 6)
             {
-                chessboard[5, 7] = chessboard[7, 7];
-                chessboard[5, 7].Position = new Vector2Int(5, 7);
-                chessboard[5, 7].wasWalking = true;
-                chessboard[5, 7].transform.position = CalcSpaceCoords(5, 7);
-                chessboard[7, 7] = null;
+                _chessboard[5, 7] = _chessboard[7, 7];
+                _chessboard[5, 7].Position = new Vector2Int(5, 7);
+                _chessboard[5, 7].wasWalking = true;
+                _chessboard[5, 7].transform.position = CalcSpaceCoords(5, 7);
+                _chessboard[7, 7] = null;
             }
             else if (_selection.x == 2)
             {
-                chessboard[3, 7] = chessboard[0, 7];
-                chessboard[3, 7].Position = new Vector2Int(3, 7);
-                chessboard[3, 7].wasWalking = true;
-                chessboard[3, 7].transform.position = CalcSpaceCoords(3, 7);
-                chessboard[0, 7] = null;
+                _chessboard[3, 7] = _chessboard[0, 7];
+                _chessboard[3, 7].Position = new Vector2Int(3, 7);
+                _chessboard[3, 7].wasWalking = true;
+                _chessboard[3, 7].transform.position = CalcSpaceCoords(3, 7);
+                _chessboard[0, 7] = null;
             }
         }
     }
@@ -339,11 +307,11 @@ public class BoardController : MonoBehaviour
         {
             for (int y = 0; y < 8; y++)
             {
-                Piece p = chessboard[x, y];
+                Piece p = _chessboard[x, y];
 
                 if (p != null && p.isWhite != _isWhiteTurn)
                 {
-                    bool[,] attackedSpaces = p.AttackedSpaces();
+                    bool[,] attackedSpaces = p.AttackedSpaces(in _chessboard);
 
                     for (int i = 0; i < 8; i++)
                     {
@@ -417,7 +385,7 @@ public class BoardController : MonoBehaviour
 
     private void PieceMoves(Piece piece)
     {
-        bool[,] pm = piece.PossibleMove();
+        bool[,] pm = piece.PossibleMove(in _chessboard);
         Piece tmp;
 
         for (int i = 0; i < 8; i++)
@@ -427,13 +395,13 @@ public class BoardController : MonoBehaviour
                 if (pm[i, j])
                 {
                     tmp = null;
-                    if (chessboard[i, j] != null)
+                    if (_chessboard[i, j] != null)
                     {
-                        tmp = chessboard[i, j];
+                        tmp = _chessboard[i, j];
                     }
 
-                    chessboard[i, j] = piece;
-                    chessboard[piece.Position.x, piece.Position.y] = null;
+                    _chessboard[i, j] = piece;
+                    _chessboard[piece.Position.x, piece.Position.y] = null;
                     CheckKing();
 
                     if (_kingIsAttacked)
@@ -445,8 +413,8 @@ public class BoardController : MonoBehaviour
                         _allowedMoves[i, j] = true;
                     }
 
-                    chessboard[i, j] = tmp;
-                    chessboard[piece.Position.x, piece.Position.y] = piece;
+                    _chessboard[i, j] = tmp;
+                    _chessboard[piece.Position.x, piece.Position.y] = piece;
                 }
             }
         }
@@ -454,7 +422,7 @@ public class BoardController : MonoBehaviour
 
     void ChangePawn(int pieceNumber)
     {
-        _GameIsPaused = false;
+        _gameIsPaused = false;
 
         if (!_selectedPiece.isWhite)
         {
@@ -469,20 +437,20 @@ public class BoardController : MonoBehaviour
         Destroy(_selectedPiece.gameObject);
 
         // выбираю новую фигуру с доски
-        _selectedPiece = chessboard[_selectedPiece.Position.x, _selectedPiece.Position.y];
+        _selectedPiece = _chessboard[_selectedPiece.Position.x, _selectedPiece.Position.y];
         // обнуляю клетку, из которой ходит фигрура
-        chessboard[_selectedPiece.Position.x, _selectedPiece.Position.y] = null;
+        _chessboard[_selectedPiece.Position.x, _selectedPiece.Position.y] = null;
         // перемещаю
         _selectedPiece.transform.position = CalcSpaceCoords(_selection.x, _selection.y);
         // присваиваю объекту фигуры новые координаты
         _selectedPiece.Position = new Vector2Int(_selection.x, _selection.y);
         _selectedPiece.wasWalking = true;
         // присваиваю фигуру клетке, в которую походил
-        chessboard[_selection.x, _selection.y] = _selectedPiece; 
+        _chessboard[_selection.x, _selection.y] = _selectedPiece; 
 
         _isWhiteTurn = !_isWhiteTurn;
 
-        DisableMoveHighligts();
+        EventManager.Broadcast("DisableMoveHighligts");
         _selectedPiece = null; // обнуляю выбранную фигуру
 
         CheckKing();
@@ -492,24 +460,24 @@ public class BoardController : MonoBehaviour
     {
         GameObject piece = Instantiate(_piecesPrefabs[index], CalcSpaceCoords(x, y), Quaternion.identity);
         piece.transform.SetParent(transform);
-        chessboard[x, y] = piece.GetComponent<Piece>();
-        chessboard[x, y].Position = new Vector2Int(x, y);
+        _chessboard[x, y] = piece.GetComponent<Piece>();
+        _chessboard[x, y].Position = new Vector2Int(x, y);
         _pieces.Add(piece);
 
         if (index == 5)
         {
-            _whiteKing = chessboard[x, y];
+            _whiteKing = _chessboard[x, y];
         }
         else if (index == 11)
         {
-            _blackKing = chessboard[x, y];
+            _blackKing = _chessboard[x, y];
         }
     }
 
     void SpawnAllPieces()
     {
         _pieces = new List<GameObject>();
-        chessboard = new Piece[8, 8];
+        _chessboard = new Piece[8, 8];
         EnPassant = new int[] { -1, -1 };
         // --- White --- //
 
@@ -572,42 +540,6 @@ public class BoardController : MonoBehaviour
         }
     }
 
-    private void CreateMoveHighligts()
-    {
-        _moveHighlights = new GameObject[8, 8];
-
-        for (int i = 0; i < 8; i++)
-        {
-            for (int j = 0; j < 8; j++)
-            {
-                _moveHighlights[i, j] = Instantiate(_moveHighlightPrefab, new Vector3(i, 0.025f, j), Quaternion.identity);
-                _moveHighlights[i, j].SetActive(false);
-            }
-        }
-    }
-
-    private void EnableMoveHighligts()
-    {
-        for (int i = 0; i < 8; i++)
-        {
-            for (int j = 0; j < 8; j++)
-            {
-                _moveHighlights[i, j].SetActive(_allowedMoves[i, j]);
-            }
-        }
-    }
-
-    private void DisableMoveHighligts()
-    {
-        for (int i = 0; i < 8; i++)
-        {
-            for (int j = 0; j < 8; j++)
-            {
-                _moveHighlights[i, j].SetActive(false);
-            }
-        }
-    }
-
     Vector3 CalcSpaceCoords(int x, int y)
     {
         return new Vector3(x, 0f, y);
@@ -615,22 +547,22 @@ public class BoardController : MonoBehaviour
 
     private void Pause(bool isPaused)
     {
-        _GameIsPaused = isPaused;
+        _gameIsPaused = isPaused;
     }
 
     private void RestartGame()
     {
         DestroyAllPieces();
-        _GameIsPaused = false;
+        _gameIsPaused = false;
         _isWhiteTurn = true;
         SpawnAllPieces();
-        DisableMoveHighligts();
+        EventManager.Broadcast("DisableMoveHighligts");
     }
 
     private void EndGame()
     {
-        DisableMoveHighligts();
         Pause(true);
-        win?.Invoke(!_isWhiteTurn);
+        EventManager.Broadcast("DisableMoveHighligts");
+        EventManager<bool>.Broadcast("PrintWinner", !_isWhiteTurn);
     }
 }

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Bishop : Piece
 {
-    public override bool[,] PossibleMove()
+    public override bool[,] PossibleMove(in Piece[,] chessboard)
     {
         bool[,] moves = new bool[8, 8];
         Piece p;
@@ -20,7 +20,7 @@ public class Bishop : Piece
             if (i < 0 || j < 0)
                 break;
 
-            p = BoardController.Instance.chessboard[i, j];
+            p = chessboard[i, j];
 
             if (p == null)
             {
@@ -48,7 +48,7 @@ public class Bishop : Piece
             if (i > 7 || j > 7)
                 break;
 
-            p = BoardController.Instance.chessboard[i, j];
+            p = chessboard[i, j];
 
             if (p == null)
             {
@@ -76,7 +76,7 @@ public class Bishop : Piece
             if (i > 7 || j < 0)
                 break;
 
-            p = BoardController.Instance.chessboard[i, j];
+            p = chessboard[i, j];
 
             if (p == null)
             {
@@ -104,7 +104,7 @@ public class Bishop : Piece
             if (i < 0 || j > 7)
                 break;
 
-            p = BoardController.Instance.chessboard[i, j];
+            p = chessboard[i, j];
 
             if (p == null)
             {
@@ -126,7 +126,7 @@ public class Bishop : Piece
         return moves;
     }
 
-    public override bool[,] AttackedSpaces()
+    public override bool[,] AttackedSpaces(in Piece[,] chessboard)
     {
         bool[,] attackedSpaces = new bool[8, 8];
 
@@ -143,7 +143,7 @@ public class Bishop : Piece
             if (i < 0 || j < 0)
                 break;
 
-            p = BoardController.Instance.chessboard[i, j];
+            p = chessboard[i, j];
 
             if (p == null || p.GetType() == typeof(King))
             {
@@ -167,7 +167,7 @@ public class Bishop : Piece
             if (i > 7 || j > 7)
                 break;
 
-            p = BoardController.Instance.chessboard[i, j];
+            p = chessboard[i, j];
 
             if (p == null || p.GetType() == typeof(King))
             {
@@ -191,7 +191,7 @@ public class Bishop : Piece
             if (i > 7 || j < 0)
                 break;
 
-            p = BoardController.Instance.chessboard[i, j];
+            p = chessboard[i, j];
 
             if (p == null || p.GetType() == typeof(King))
             {
@@ -215,7 +215,7 @@ public class Bishop : Piece
             if (i < 0 || j > 7)
                 break;
 
-            p = BoardController.Instance.chessboard[i, j];
+            p = chessboard[i, j];
 
             if (p == null || p.GetType() == typeof(King))
             {
