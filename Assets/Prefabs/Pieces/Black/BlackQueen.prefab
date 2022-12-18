@@ -94,4 +94,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a7777abfe446c8447991d8617a78c48a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  isWhite: 0
+  team: 1
+  wasWalking: 0
