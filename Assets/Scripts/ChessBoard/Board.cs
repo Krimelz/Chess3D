@@ -4,6 +4,7 @@ using Animations;
 using Menu;
 using Pieces;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace ChessBoard
 {
@@ -16,9 +17,11 @@ namespace ChessBoard
         [SerializeField] private Tween tween;
         [SerializeField] private AnimationCurve curve;
         [SerializeField] private float duration;
-        [SerializeField] private GameObject highlihgt;
+        [SerializeField] private GameObject highlight;
         [SerializeField] private GameObject[] whitePiecesPrefabs;
         [SerializeField] private GameObject[] blackPiecesPrefabs;
+        [SerializeField] private Transform whiteView;
+        [SerializeField] private Transform blackView;
 
         public int[] EnPassant { get; set; }
         public bool EnPassantColor { get; set; }
@@ -66,11 +69,12 @@ namespace ChessBoard
             if (_gameIsPaused)
                 return;
 
-            UpdateSelection();
+            if (!_isMoving)
+                UpdateSelection();
 
-            if (Input.GetMouseButtonDown(0))
+            if (Input.GetMouseButtonDown(0) && !_isMoving)
             {
-                if (highlihgt.activeSelf)
+                if (highlight.activeSelf)
                 {
                     if (_selectedPiece == null)
                     {
@@ -80,8 +84,14 @@ namespace ChessBoard
                     {
                         if (_allowedMoves[_selection.x, _selection.y])
                         {
-                            OnMoveStarted();
-                            OnMoveCompleted();
+                            tween.MoveToPosition(
+                                _selectedPiece.transform,
+                                new Vector3(_selection.x, 0f,_selection.y),
+                                duration,
+                                curve,
+                                OnMoveStarted,
+                                OnMoveCompleted
+                            );
                         }
                     }
                 }
@@ -98,6 +108,13 @@ namespace ChessBoard
             MovePiece(_selection.x, _selection.y);
             CheckKing();
             IsCheckmate();
+
+            // TODO
+            var ra = Camera.main.GetComponent<RotationAround>();
+            ra.RotateTo(
+                _teamTurn == Team.White ? whiteView.position : blackView.position
+            );
+
             _isMoving = false;
         }
 
@@ -107,13 +124,13 @@ namespace ChessBoard
 
             if (Physics.Raycast(_ray, out _hit))
             {
-                highlihgt.SetActive(true);
+                highlight.SetActive(true);
                 _selection = new Vector2Int(Mathf.RoundToInt(_hit.point.x), Mathf.RoundToInt(_hit.point.z));
-                highlihgt.transform.position = new Vector3(_selection.x, 0.015f, _selection.y);
+                highlight.transform.position = new Vector3(_selection.x, 0.015f, _selection.y);
             }
             else
             {
-                highlihgt.SetActive(false);
+                highlight.SetActive(false);
             }
         }
 

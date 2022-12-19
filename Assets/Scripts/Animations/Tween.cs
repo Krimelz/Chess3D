@@ -7,23 +7,25 @@ namespace Animations
     public class Tween : MonoBehaviour
     {
         public void MoveToPosition(Transform t, Vector3 endPosition, float duration,
-            AnimationCurve curve, Action onCompleted = null)
+            AnimationCurve curve, Action onStarted = null, Action onCompleted = null)
         {
-            StartCoroutine(Move(t, endPosition, duration, curve, onCompleted));
+            StartCoroutine(Move(t, endPosition, duration, curve, onStarted, onCompleted));
         }
 
         public void RotateAroundPoint(Transform t, Vector3 point, Vector3 axis, float angle, float duration,
-            AnimationCurve curve, Action onCompleted = null)
+            AnimationCurve curve, Action onStarted = null, Action onCompleted = null)
         {
-            StartCoroutine(Rotate(t, point, axis, angle, duration, curve, onCompleted));
+            StartCoroutine(Rotate(t, point, axis, angle, duration, curve, onStarted, onCompleted));
         }
 
         private IEnumerator Move(Transform t, Vector3 endPosition, float duration,
-            AnimationCurve curve, Action onCompleted)
+            AnimationCurve curve, Action onStarted, Action onCompleted)
         {
             var elapsedTime = 0f;
             var startPosition = t.position;
 
+            onStarted?.Invoke();
+            
             while (elapsedTime <= duration)
             {
                 elapsedTime += Time.deltaTime;
@@ -41,10 +43,12 @@ namespace Animations
         }
         
         private IEnumerator Rotate(Transform t, Vector3 point, Vector3 axis, float angle, float duration,
-            AnimationCurve curve, Action onCompleted)
+            AnimationCurve curve, Action onStarted, Action onCompleted)
         {
             var elapsedTime = 0f;
             var oldAngle = 0f;
+
+            onStarted?.Invoke();
 
             while (elapsedTime <= duration)
             {

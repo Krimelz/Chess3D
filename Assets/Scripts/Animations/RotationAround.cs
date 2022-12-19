@@ -1,39 +1,69 @@
 using System;
 using System.Collections;
 using System.Threading.Tasks;
+using ChessBoard;
 using UnityEngine;
 
 namespace Animations
 {
     public class RotationAround : MonoBehaviour
     {
+        [SerializeField] private Transform target;
+        [SerializeField] private float sensitivity;
         [SerializeField] private AnimationCurve curve;
         [SerializeField] private float duration;
-        [SerializeField] private float angle;
-        [SerializeField] private Vector3 axis = Vector3.up;
-        [SerializeField] private Transform target;
 
-        // TODO: Move to Editor script
-        private void OnDrawGizmos()
+        private Coroutine rot;
+
+        private void Update()
         {
-            Gizmos.color = Color.red;
-            var position = target.position;
-            Gizmos.DrawRay(position, axis * 2f);
-            
-            Gizmos.color = Color.green;
-            var position1 = transform.position;
-            Vector3 startPosition = position1 - position;
-            Vector3 oldPosition = position1;
-            
-            for (float i = 0f; i <= angle; i += 1f)
+            if (Input.GetMouseButton(1) && rot == null)
             {
-                var rotation = Quaternion.AngleAxis(i, axis);
-                var newPosition = rotation * startPosition + target.position;
-                
-                Gizmos.DrawLine(oldPosition, newPosition);
-
-                oldPosition = newPosition;
+                RotateFree();
             }
+
+            transform.LookAt(target);
+        }
+
+        private void RotateFree()
+        {
+            var deltaX = Input.GetAxis("Mouse X") * sensitivity * Time.deltaTime;
+            var deltaY = Input.GetAxis("Mouse Y") * sensitivity * Time.deltaTime;
+
+            var position = target.position;
+            
+            transform.RotateAround(position, Vector3.up, deltaX);
+            transform.RotateAround(position, Vector3.left, -deltaY);
+        }
+
+        public void RotateTo(Vector3 point, Action onStarted = null, Action onCompleted = null)
+        {
+            rot = StartCoroutine(RotateToCoroutine(point, onStarted, onCompleted));
+        }
+
+        private IEnumerator RotateToCoroutine(Vector3 point, Action onStarted, Action onCompleted)
+        {
+            var elapsedTime = 0f;
+            var position = target.position;
+            var oldPosition = transform.position - position;
+            var newPosition = point - position;
+            
+            onStarted?.Invoke();
+
+            while (elapsedTime <= duration)
+            {
+                elapsedTime += Time.deltaTime;
+                
+                var time = elapsedTime / duration;
+                var value = curve.Evaluate(time);
+
+                transform.position = Vector3.Slerp(oldPosition, newPosition, value) + position;
+
+                yield return null;
+            }
+            
+            onCompleted?.Invoke();
+            rot = null;
         }
     }
 }

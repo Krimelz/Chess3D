@@ -133,7 +133,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2817216}
   m_Layer: 0
-  m_Name: End
+  m_Name: BlackView
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -147,7 +147,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2817215}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.31, y: 8.72, z: 8.49}
+  m_LocalPosition: {x: 3.5, y: 7, z: 10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -560,8 +560,8 @@ MonoBehaviour:
     - serializedVersion: 3
       time: 0
       value: 0
-      inSlope: 2
-      outSlope: 2
+      inSlope: 0
+      outSlope: 0
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
@@ -569,8 +569,8 @@ MonoBehaviour:
     - serializedVersion: 3
       time: 1
       value: 1
-      inSlope: 0
-      outSlope: 0
+      inSlope: 2
+      outSlope: 2
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
@@ -578,8 +578,8 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  duration: 1
-  highlihgt: {fileID: 1761793273}
+  duration: 0.5
+  highlight: {fileID: 1761793273}
   whitePiecesPrefabs:
   - {fileID: 6701472886605000626, guid: e5d9db2dc8146dd4db2d2ad28dc5b8d4, type: 3}
   - {fileID: 4591324205691979801, guid: 214bfd04e40166f47bcd2c9e324699b2, type: 3}
@@ -594,6 +594,8 @@ MonoBehaviour:
   - {fileID: 7541834497177910232, guid: 475b84d2bb14bcd44bc73533107cac77, type: 3}
   - {fileID: 2819785137741521360, guid: 1dbbbeddd36e620459ce39a8ceccb5ca, type: 3}
   - {fileID: 7043365071066418629, guid: 2059c08d07740144d92aa7dc13adf43b, type: 3}
+  whiteView: {fileID: 991547335}
+  blackView: {fileID: 2817216}
   _moveHighlightPrefab: {fileID: 1286990052966202235, guid: 10f6386b3a6a4a646b270d205ed049c9, type: 3}
 --- !u!114 &478620442
 MonoBehaviour:
@@ -1067,7 +1069,7 @@ GameObject:
   m_Component:
   - component: {fileID: 991547335}
   m_Layer: 0
-  m_Name: Start
+  m_Name: WhiteView
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1081,7 +1083,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 991547334}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 4.2, y: 7.28, z: -3.15}
+  m_LocalPosition: {x: 3.5, y: 7, z: -3}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -1367,7 +1369,6 @@ GameObject:
   - component: {fileID: 1806537401}
   - component: {fileID: 1806537404}
   - component: {fileID: 1806537405}
-  - component: {fileID: 1806537406}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -1434,7 +1435,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1806537400}
   m_LocalRotation: {x: 0.5224985, y: 0, z: 0, w: 0.8526402}
-  m_LocalPosition: {x: 3.5, y: 7.62, z: -1.27}
+  m_LocalPosition: {x: 3.5, y: 7.432512, z: -1.1137581}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -1480,51 +1481,13 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1806537400}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 8cd15c2b09e01804683081ad2b2a7f96, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  curve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  duration: 2
-  angle: 180
-  axis: {x: 0, y: 1, z: 0}
   target: {fileID: 461865111}
---- !u!114 &1806537406
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1806537400}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 04fe121ff36746368da481eb3f5439b0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  sensitivity: 25
   curve:
     serializedVersion: 2
     m_Curve:
@@ -1549,9 +1512,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  duration: 2
-  points: []
-  axis: {x: 0, y: 1, z: 0}
+  duration: 1
 --- !u!1 &2066813753
 GameObject:
   m_ObjectHideFlags: 0

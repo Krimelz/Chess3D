@@ -1,6 +1,5 @@
 ﻿using ChessBoard;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Pieces
 {
