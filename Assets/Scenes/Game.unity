@@ -569,8 +569,8 @@ MonoBehaviour:
     - serializedVersion: 3
       time: 1
       value: 1
-      inSlope: 2
-      outSlope: 2
+      inSlope: 0
+      outSlope: 0
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
@@ -578,7 +578,8 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  duration: 0.5
+  pieceMoveDuration: 0.5
+  cameraMoveDuration: 2
   highlight: {fileID: 1761793273}
   whitePiecesPrefabs:
   - {fileID: 6701472886605000626, guid: e5d9db2dc8146dd4db2d2ad28dc5b8d4, type: 3}
@@ -596,7 +597,9 @@ MonoBehaviour:
   - {fileID: 7043365071066418629, guid: 2059c08d07740144d92aa7dc13adf43b, type: 3}
   whiteView: {fileID: 991547335}
   blackView: {fileID: 2817216}
+  target: {fileID: 461865111}
   _moveHighlightPrefab: {fileID: 1286990052966202235, guid: 10f6386b3a6a4a646b270d205ed049c9, type: 3}
+  _camera: {fileID: 1806537402}
 --- !u!114 &478620442
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1435,7 +1438,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1806537400}
   m_LocalRotation: {x: 0.5224985, y: 0, z: 0, w: 0.8526402}
-  m_LocalPosition: {x: 3.5, y: 7.432512, z: -1.1137581}
+  m_LocalPosition: {x: 3.5, y: 7, z: -3}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -1487,32 +1490,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   target: {fileID: 461865111}
-  sensitivity: 25
-  curve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  duration: 1
+  sensitivity: 3
 --- !u!1 &2066813753
 GameObject:
   m_ObjectHideFlags: 0

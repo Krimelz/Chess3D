@@ -4,25 +4,25 @@ using UnityEngine;
 
 namespace Animations
 {
-    public class Tween : MonoBehaviour
+	public class Tween : MonoBehaviour
     {
-        public void MoveToPosition(Transform t, Vector3 endPosition, float duration,
+        public void MoveToPosition(Transform transform, Vector3 endPosition, float duration,
             AnimationCurve curve, Action onStarted = null, Action onCompleted = null)
         {
-            StartCoroutine(Move(t, endPosition, duration, curve, onStarted, onCompleted));
+            StartCoroutine(MoveToPositionCoroutine(transform, endPosition, duration, curve, onStarted, onCompleted));
         }
 
-        public void RotateAroundPoint(Transform t, Vector3 point, Vector3 axis, float angle, float duration,
+        public void RotateAroundPoint(Transform transform, Vector3 point, Vector3 target, float duration,
             AnimationCurve curve, Action onStarted = null, Action onCompleted = null)
         {
-            StartCoroutine(Rotate(t, point, axis, angle, duration, curve, onStarted, onCompleted));
+            StartCoroutine(RotateAroundPointCoroutine(transform, point, target, duration, curve, onStarted, onCompleted));
         }
 
-        private IEnumerator Move(Transform t, Vector3 endPosition, float duration,
+        private IEnumerator MoveToPositionCoroutine(Transform transform, Vector3 endPosition, float duration,
             AnimationCurve curve, Action onStarted, Action onCompleted)
         {
             var elapsedTime = 0f;
-            var startPosition = t.position;
+            var startPosition = transform.position;
 
             onStarted?.Invoke();
             
@@ -34,38 +34,37 @@ namespace Animations
                 var value = curve.Evaluate(time);
 
                 var position = Vector3.Lerp(startPosition, endPosition, value);
-                t.position = position;
+                transform.position = position;
 
                 yield return null;
             }
             
             onCompleted?.Invoke();
         }
-        
-        private IEnumerator Rotate(Transform t, Vector3 point, Vector3 axis, float angle, float duration,
+
+        private IEnumerator RotateAroundPointCoroutine(Transform transform, Vector3 endPosition, Vector3 point, float duration,
             AnimationCurve curve, Action onStarted, Action onCompleted)
         {
             var elapsedTime = 0f;
-            var oldAngle = 0f;
+
+            var start = transform.position;
+            var end = endPosition;
 
             onStarted?.Invoke();
 
             while (elapsedTime <= duration)
             {
                 elapsedTime += Time.deltaTime;
-                
+
                 var time = elapsedTime / duration;
                 var value = curve.Evaluate(time);
 
-                var newAngle = Mathf.Lerp(0f, angle, value);
-                t.RotateAround(point, axis, newAngle - oldAngle);
-                t.LookAt(point);
-
-                oldAngle = newAngle;
+                transform.position = Vector3.Slerp(start, end, value);
+                transform.LookAt(point);
 
                 yield return null;
             }
-            
+
             onCompleted?.Invoke();
         }
     }

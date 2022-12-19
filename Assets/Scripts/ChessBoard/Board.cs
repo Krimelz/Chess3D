@@ -4,24 +4,26 @@ using Animations;
 using Menu;
 using Pieces;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace ChessBoard
 {
-    public class Board : MonoBehaviour
+	public class Board : MonoBehaviour
     {
         public static Board Instance { get; private set; }
+
         public event Action<Team> OnWin;
         public event Action OnChangePawn;
 
         [SerializeField] private Tween tween;
         [SerializeField] private AnimationCurve curve;
-        [SerializeField] private float duration;
+        [SerializeField] private float pieceMoveDuration;
+        [SerializeField] private float cameraMoveDuration;
         [SerializeField] private GameObject highlight;
         [SerializeField] private GameObject[] whitePiecesPrefabs;
         [SerializeField] private GameObject[] blackPiecesPrefabs;
         [SerializeField] private Transform whiteView;
         [SerializeField] private Transform blackView;
+        [SerializeField] private Transform target;
 
         public int[] EnPassant { get; set; }
         public bool EnPassantColor { get; set; }
@@ -30,7 +32,7 @@ namespace ChessBoard
         private bool[,] _allowedMoves { get; set; }
         private bool[,] _allSpacesUnderAttack { get; set; }
 
-        private Camera _camera;
+        [SerializeField] private Camera _camera;
         private Ray _ray;
         private RaycastHit _hit;
 
@@ -55,6 +57,8 @@ namespace ChessBoard
         private void Start()
         {
             _camera = Camera.main;
+            _camera.transform.position = whiteView.position;
+            _camera.transform.LookAt(target);
 
             GameMenu.Instance.OnRestartGame += RestartGame;
             GameMenu.Instance.OnChangePawn += ChangePawn;
@@ -87,7 +91,7 @@ namespace ChessBoard
                             tween.MoveToPosition(
                                 _selectedPiece.transform,
                                 new Vector3(_selection.x, 0f,_selection.y),
-                                duration,
+                                pieceMoveDuration,
                                 curve,
                                 OnMoveStarted,
                                 OnMoveCompleted
@@ -109,13 +113,19 @@ namespace ChessBoard
             CheckKing();
             IsCheckmate();
 
-            // TODO
-            var ra = Camera.main.GetComponent<RotationAround>();
-            ra.RotateTo(
-                _teamTurn == Team.White ? whiteView.position : blackView.position
-            );
+            Vector3 position;
 
-            _isMoving = false;
+            if (_teamTurn == Team.White)
+			{
+                position = whiteView.position;
+			}
+            else
+			{
+                position = blackView.position;
+			}
+
+            tween.RotateAroundPoint(_camera.transform, position, target.position,
+                cameraMoveDuration, curve, onCompleted: () => _isMoving = false);
         }
 
         private void UpdateSelection()
@@ -628,5 +638,11 @@ namespace ChessBoard
             Pause(true);
             OnWin?.Invoke(_teamTurn);
         }
-    }
+
+		private void OnDrawGizmos()
+		{
+            var radius = Vector3.Distance(target.position, _camera.transform.position);
+            Gizmos.DrawWireSphere(target.position, radius);
+		}
+	}
 }
