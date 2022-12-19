@@ -48,6 +48,8 @@ namespace ChessBoard
         private bool _kingIsAttacked;
 
         private bool _isMoving;
+        private bool _isDragged;
+        private Vector2Int _prevSelection;
 
         private void Awake()
         {
@@ -76,28 +78,64 @@ namespace ChessBoard
             if (!_isMoving)
                 UpdateSelection();
 
-            if (Input.GetMouseButtonDown(0) && !_isMoving)
+            if (Input.GetMouseButton(0) && !_isMoving)
             {
                 if (highlight.activeSelf)
                 {
-                    if (_selectedPiece == null)
-                    {
-                        SelectPiece(_selection.x, _selection.y);
-                    }
-                    else
-                    {
-                        if (_allowedMoves[_selection.x, _selection.y])
+                    if (Input.GetMouseButtonDown(0))
+					{
+                        if (_selectedPiece == null)
                         {
-                            tween.MoveToPosition(
-                                _selectedPiece.transform,
-                                new Vector3(_selection.x, 0f,_selection.y),
-                                pieceMoveDuration,
-                                curve,
-                                OnMoveStarted,
-                                OnMoveCompleted
-                            );
+                            SelectPiece(_selection.x, _selection.y);
                         }
+                        else
+                        {
+                            if (_allowedMoves[_selection.x, _selection.y])
+                            {
+                                tween.MoveToPosition(
+                                    _selectedPiece.transform,
+                                    new Vector3(_selection.x, 0f, _selection.y),
+                                    pieceMoveDuration,
+                                    curve,
+                                    OnMoveStarted,
+                                    OnMoveCompleted
+                                );
+                            }
+                        }
+
+                        return;
                     }
+
+                    var delta = _selection - _prevSelection;
+                    if (delta != Vector2Int.zero)
+					{
+                        _isDragged = false;
+					}
+
+                    if (_selectedPiece != null && _allowedMoves[_selection.x, _selection.y] && !_isDragged)
+                    {
+                        var endPosition = new Vector3(_selection.x, 1f, _selection.y);
+                        tween.MoveToPosition(_selectedPiece.transform, endPosition, pieceMoveDuration, curve,
+                            () => _isDragged = true,
+                            () => _isDragged = false
+                        );
+                        _prevSelection = _selection;
+                    }
+                }
+            }
+
+            if (Input.GetMouseButtonUp(0))
+            {
+                if (_selectedPiece != null && _allowedMoves[_selection.x, _selection.y])
+                {
+                    tween.MoveToPosition(
+                        _selectedPiece.transform,
+                        new Vector3(_selection.x, 0f, _selection.y),
+                        pieceMoveDuration,
+                        curve,
+                        OnMoveStarted,
+                        OnMoveCompleted
+                    );
                 }
             }
         }
@@ -638,11 +676,5 @@ namespace ChessBoard
             Pause(true);
             OnWin?.Invoke(_teamTurn);
         }
-
-		private void OnDrawGizmos()
-		{
-            var radius = Vector3.Distance(target.position, _camera.transform.position);
-            Gizmos.DrawWireSphere(target.position, radius);
-		}
 	}
 }
