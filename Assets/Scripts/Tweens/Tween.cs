@@ -2,14 +2,14 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-namespace Animations
+namespace Tweens
 {
 	public class Tween : MonoBehaviour
     {
         private Coroutine _moveToPositionCoroutine;
         private Coroutine _rotateAroundPointCoroutine;
 
-        public void MoveToPosition(Transform transform, Vector3 endPosition, float duration,
+        public void MoveToPosition(Transform objectTransform, Vector3 endPosition, float duration,
             AnimationCurve curve, Action onStarted = null, Action onCompleted = null)
         {
             if (_moveToPositionCoroutine != null)
@@ -18,10 +18,10 @@ namespace Animations
             }
 
             _moveToPositionCoroutine = 
-                StartCoroutine(MoveToPositionCoroutine(transform, endPosition, duration, curve, onStarted, onCompleted));
+                StartCoroutine(MoveToPositionCoroutine(objectTransform, endPosition, duration, curve, onStarted, onCompleted));
         }
 
-        public void RotateAroundPoint(Transform transform, Vector3 point, Vector3 target, float duration,
+        public void RotateAroundPoint(Transform objectTransform, Vector3 point, Vector3 target, float duration,
             AnimationCurve curve, Action onStarted = null, Action onCompleted = null)
         {
             if (_rotateAroundPointCoroutine != null)
@@ -30,14 +30,14 @@ namespace Animations
             }
 
             _rotateAroundPointCoroutine = 
-                StartCoroutine(RotateAroundPointCoroutine(transform, point, target, duration, curve, onStarted, onCompleted));
+                StartCoroutine(RotateAroundPointCoroutine(objectTransform, point, target, duration, curve, onStarted, onCompleted));
         }
 
-        private IEnumerator MoveToPositionCoroutine(Transform transform, Vector3 endPosition, float duration,
+        private IEnumerator MoveToPositionCoroutine(Transform objectTransform, Vector3 endPosition, float duration,
             AnimationCurve curve, Action onStarted, Action onCompleted)
         {
             var elapsedTime = 0f;
-            var startPosition = transform.position;
+            var startPosition = objectTransform.position;
 
             onStarted?.Invoke();
             
@@ -49,7 +49,7 @@ namespace Animations
                 var value = curve.Evaluate(time);
 
                 var position = Vector3.Lerp(startPosition, endPosition, value);
-                transform.position = position;
+                objectTransform.position = position;
 
                 yield return null;
             }
@@ -57,11 +57,11 @@ namespace Animations
             onCompleted?.Invoke();
         }
 
-        private IEnumerator RotateAroundPointCoroutine(Transform transform, Vector3 endPosition, Vector3 point, float duration,
+        private IEnumerator RotateAroundPointCoroutine(Transform objectTransform, Vector3 endPosition, Vector3 point, float duration,
             AnimationCurve curve, Action onStarted, Action onCompleted)
         {
             var elapsedTime = 0f;
-            var startPosition = transform.position;
+            var startPosition = objectTransform.position;
 
             onStarted?.Invoke();
 
@@ -72,8 +72,8 @@ namespace Animations
                 var time = elapsedTime / duration;
                 var value = curve.Evaluate(time);
 
-                transform.position = Vector3.Slerp(startPosition, endPosition, value);
-                transform.LookAt(point);
+                objectTransform.position = Vector3.Slerp(startPosition, endPosition, value);
+                objectTransform.LookAt(point);
 
                 yield return null;
             }

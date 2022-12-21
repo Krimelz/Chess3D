@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using Animations;
 using Menu;
 using Pieces;
+using Tweens;
 using UnityEngine;
 
 namespace ChessBoard
 {
-	public class Board : MonoBehaviour
+    public class Board : MonoBehaviour
     {
         public static Board Instance { get; private set; }
 
@@ -15,7 +15,8 @@ namespace ChessBoard
         public event Action OnChangePawn;
 
         [SerializeField] private Tween tween;
-        [SerializeField] private AnimationCurve curve;
+        [SerializeField] private AnimationCurve movementCurve;
+        [SerializeField] private AnimationCurve rotationCurve;
         [SerializeField] private float pieceMoveDuration;
         [SerializeField] private float cameraMoveDuration;
         [SerializeField] private GameObject highlight;
@@ -48,7 +49,6 @@ namespace ChessBoard
         private bool _kingIsAttacked;
 
         private bool _isMoving;
-        private bool _isDragged;
         private Vector2Int _prevSelection;
 
         private void Awake()
@@ -59,8 +59,12 @@ namespace ChessBoard
         private void Start()
         {
             _camera = Camera.main;
-            _camera.transform.position = whiteView.position;
-            _camera.transform.LookAt(target);
+            
+            if (_camera != null)
+            {
+                _camera.transform.position = whiteView.position;
+                _camera.transform.LookAt(target);
+            }
 
             GameMenu.Instance.OnRestartGame += RestartGame;
             GameMenu.Instance.OnChangePawn += ChangePawn;
@@ -77,26 +81,28 @@ namespace ChessBoard
 
             if (!_isMoving)
                 UpdateSelection();
-
+            
             if (Input.GetMouseButton(0) && !_isMoving)
             {
                 if (highlight.activeSelf)
                 {
                     if (Input.GetMouseButtonDown(0))
-					{
+                    {
                         if (_selectedPiece == null)
                         {
                             SelectPiece(_selection.x, _selection.y);
                         }
                         else
                         {
-                            if (_allowedMoves[_selection.x, _selection.y])
+                            if (_selectedPiece != null && _allowedMoves[_selection.x, _selection.y])
                             {
+                                var endPosition = new Vector3(_selection.x, 0f, _selection.y);
+
                                 tween.MoveToPosition(
                                     _selectedPiece.transform,
-                                    new Vector3(_selection.x, 0f, _selection.y),
+                                    endPosition,
                                     pieceMoveDuration,
-                                    curve,
+                                    movementCurve,
                                     OnMoveStarted,
                                     OnMoveCompleted
                                 );
@@ -106,33 +112,32 @@ namespace ChessBoard
                         return;
                     }
 
-                    var delta = _selection - _prevSelection;
-                    if (delta != Vector2Int.zero)
-					{
-                        _isDragged = false;
-					}
-
-                    if (_selectedPiece != null && _allowedMoves[_selection.x, _selection.y] && !_isDragged)
+                    if (_selectedPiece != null && _allowedMoves[_selection.x, _selection.y] && IsDragged())
                     {
-                        var endPosition = new Vector3(_selection.x, 1f, _selection.y);
-                        tween.MoveToPosition(_selectedPiece.transform, endPosition, pieceMoveDuration, curve,
-                            () => _isDragged = true,
-                            () => _isDragged = false
+                        var endPosition = new Vector3(_selection.x, 0.35f, _selection.y);
+                        
+                        tween.MoveToPosition(
+                            _selectedPiece.transform,
+                            endPosition,
+                            pieceMoveDuration,
+                            movementCurve,
+                            () => _prevSelection = _selection
                         );
-                        _prevSelection = _selection;
                     }
                 }
             }
 
             if (Input.GetMouseButtonUp(0))
             {
+                var endPosition = new Vector3(_selection.x, 0f, _selection.y);
+                
                 if (_selectedPiece != null && _allowedMoves[_selection.x, _selection.y])
                 {
                     tween.MoveToPosition(
                         _selectedPiece.transform,
-                        new Vector3(_selection.x, 0f, _selection.y),
+                        endPosition,
                         pieceMoveDuration,
-                        curve,
+                        movementCurve,
                         OnMoveStarted,
                         OnMoveCompleted
                     );
@@ -140,30 +145,31 @@ namespace ChessBoard
             }
         }
 
+        private bool IsDragged()
+        {
+            var delta = _selection - _prevSelection;
+            return delta != Vector2Int.zero;
+        }
+
         private void OnMoveStarted()
         {
             _isMoving = true;
         }
-        
+
         private void OnMoveCompleted()
         {
             MovePiece(_selection.x, _selection.y);
             CheckKing();
             IsCheckmate();
+            RotateBoardToTeam(_teamTurn);
+        }
 
-            Vector3 position;
-
-            if (_teamTurn == Team.White)
-			{
-                position = whiteView.position;
-			}
-            else
-			{
-                position = blackView.position;
-			}
-
-            tween.RotateAroundPoint(_camera.transform, position, target.position,
-                cameraMoveDuration, curve, onCompleted: () => _isMoving = false);
+        private void RotateBoardToTeam(Team team)
+        {
+            var endPosition = team == Team.White ? whiteView.position : blackView.position;
+            
+            tween.RotateAroundPoint(_camera.transform, endPosition, target.position,
+                cameraMoveDuration, rotationCurve, onCompleted: () => _isMoving = false);
         }
 
         private void UpdateSelection()
@@ -246,7 +252,7 @@ namespace ChessBoard
                 EndGame();
             }
         }
-        
+
         private void SelectPiece(int x, int y)
         {
             if (chessboard[x, y] == null)
@@ -266,7 +272,7 @@ namespace ChessBoard
             {
                 _allowedMoves = _selectedPiece.PossibleMove();
                 PieceMoves(_selectedPiece);
-            }   
+            }
 
 
             if (!HasMoves())
@@ -365,9 +371,6 @@ namespace ChessBoard
                 _kingIsAttacked = false;
             }
 
-            //if (_kingIsAttacked)
-            //    return;    
-
             DisableMoveHighlights();
             _selectedPiece = null;
         }
@@ -451,7 +454,7 @@ namespace ChessBoard
             else
             {
                 _kingIsAttacked = _allSpacesUnderAttack[_blackKing.Position.x, _blackKing.Position.y];
-            }  
+            }
         }
 
         private void KingMoves()
@@ -528,13 +531,13 @@ namespace ChessBoard
             _pieces.Remove(_selectedPiece.gameObject);
             SpawnPiece(_teamTurn, type, _selectedPiece.Position.x, _selectedPiece.Position.y);
             Destroy(_selectedPiece.gameObject);
-            
+
             _selectedPiece = chessboard[_selectedPiece.Position.x, _selectedPiece.Position.y];
             chessboard[_selectedPiece.Position.x, _selectedPiece.Position.y] = null;
             _selectedPiece.transform.position = CalcSpaceCoords(_selection.x, _selection.y);
             _selectedPiece.Position = new Vector2Int(_selection.x, _selection.y);
             _selectedPiece.wasWalking = true;
-            chessboard[_selection.x, _selection.y] = _selectedPiece; 
+            chessboard[_selection.x, _selection.y] = _selectedPiece;
 
             _teamTurn = _teamTurn == Team.White ? Team.Black : Team.White;
 
@@ -542,6 +545,8 @@ namespace ChessBoard
             _selectedPiece = null;
 
             CheckKing();
+            IsCheckmate();
+            RotateBoardToTeam(_teamTurn);
         }
 
         private void SpawnPiece(Team team, PieceType type, int x, int y)
@@ -556,7 +561,7 @@ namespace ChessBoard
             {
                 piece = Instantiate(blackPiecesPrefabs[(int)type], CalcSpaceCoords(x, y), Quaternion.identity);
             }
-            
+
             piece.transform.SetParent(transform);
             chessboard[x, y] = piece.GetComponent<Piece>();
             chessboard[x, y].Position = new Vector2Int(x, y);
@@ -582,7 +587,7 @@ namespace ChessBoard
             {
                 SpawnPiece(Team.White, PieceType.Pawn, i, 1);
             }
-            
+
             SpawnPiece(Team.White, PieceType.Knight, 1, 0);
             SpawnPiece(Team.White, PieceType.Knight, 6, 0);
             SpawnPiece(Team.White, PieceType.Rook, 0, 0);
@@ -591,14 +596,14 @@ namespace ChessBoard
             SpawnPiece(Team.White, PieceType.Bishop, 5, 0);
             SpawnPiece(Team.White, PieceType.Queen, 3, 0);
             SpawnPiece(Team.White, PieceType.King, 4, 0);
-            
+
             for (int i = 0; i < 8; i++)
             {
                 SpawnPiece(Team.Black, PieceType.Pawn, i, 6);
             }
 
-            SpawnPiece(Team.Black,PieceType.Knight, 1, 7);
-            SpawnPiece(Team.Black,PieceType.Knight, 6, 7);
+            SpawnPiece(Team.Black, PieceType.Knight, 1, 7);
+            SpawnPiece(Team.Black, PieceType.Knight, 6, 7);
             SpawnPiece(Team.Black, PieceType.Rook, 0, 7);
             SpawnPiece(Team.Black, PieceType.Rook, 7, 7);
             SpawnPiece(Team.Black, PieceType.Bishop, 2, 7);
@@ -623,7 +628,8 @@ namespace ChessBoard
             {
                 for (int j = 0; j < 8; j++)
                 {
-                    _moveHighlights[i, j] = Instantiate(_moveHighlightPrefab, new Vector3(i, 0.025f, j), Quaternion.identity);
+                    _moveHighlights[i, j] =
+                        Instantiate(_moveHighlightPrefab, new Vector3(i, 0.025f, j), Quaternion.identity);
                     _moveHighlights[i, j].SetActive(false);
                 }
             }
@@ -668,13 +674,16 @@ namespace ChessBoard
             _teamTurn = Team.White;
             SpawnAllPieces();
             DisableMoveHighlights();
+            RotateBoardToTeam(_teamTurn);
         }
 
         private void EndGame()
         {
             DisableMoveHighlights();
             Pause(true);
-            OnWin?.Invoke(_teamTurn);
+            Team winner = _teamTurn == Team.White ? Team.Black : Team.White;
+            RotateBoardToTeam(winner);
+            OnWin?.Invoke(winner);
         }
-	}
+    }
 }

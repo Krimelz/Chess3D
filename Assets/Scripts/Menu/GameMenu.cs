@@ -2,7 +2,6 @@
 using ChessBoard;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace Menu
@@ -52,18 +51,18 @@ namespace Menu
             }
         }
 
-        public void EnableChangePawn()
+        private void EnableChangePawn()
         {
             changePawn.SetActive(true);
         }
 
-        public void GetNewPiece(PieceType type)
+        private void GetNewPiece(PieceType type)
         {
             OnChangePawn?.Invoke(type);
             changePawn.SetActive(false);
         }
 
-        public void PrintWinner(Team turn)
+        private void PrintWinner(Team turn)
         {
             gameMenu.SetActive(true);
             winText.text = $"{turn.ToString().ToUpper()} WINS";
