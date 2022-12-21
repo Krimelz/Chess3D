@@ -1,16 +1,28 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 namespace Menu
 {
     public class MainMenu : MonoBehaviour
     {
-        public void StartGame()
+        public string gameScene;
+        public Button start;
+        public Button exit;
+
+        private void Start()
         {
-            SceneManager.LoadScene("GameScene");
+            start.onClick.AddListener(StartGame);
+            exit.onClick.AddListener(ExitGame);
         }
 
-        public void ExitGame()
+        private void StartGame()
+        {
+            SceneManager.LoadScene(gameScene);
+        }
+
+        private void ExitGame()
         {
             Application.Quit();
         }

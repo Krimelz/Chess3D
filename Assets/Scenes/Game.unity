@@ -602,7 +602,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  pieceMoveDuration: 0.5
+  pieceMoveDuration: 0.6
   cameraMoveDuration: 2
   highlight: {fileID: 1761793273}
   whitePiecesPrefabs:

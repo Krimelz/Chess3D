@@ -94,7 +94,7 @@ namespace ChessBoard
                         }
                         else
                         {
-                            if (_selectedPiece != null && _allowedMoves[_selection.x, _selection.y])
+                            if (_allowedMoves[_selection.x, _selection.y])
                             {
                                 var endPosition = new Vector3(_selection.x, 0f, _selection.y);
 
@@ -131,7 +131,7 @@ namespace ChessBoard
             {
                 var endPosition = new Vector3(_selection.x, 0f, _selection.y);
                 
-                if (_selectedPiece != null && _allowedMoves[_selection.x, _selection.y])
+                if (_selectedPiece != null && _allowedMoves[_selection.x, _selection.y] && !_isMoving)
                 {
                     tween.MoveToPosition(
                         _selectedPiece.transform,
